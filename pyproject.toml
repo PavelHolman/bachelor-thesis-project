@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "electricity-price-forecasting"
+version = "0.1.0"
+description = ""
+authors = ["Pavel Holman <holmapav@fit.cvut.cz>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+numpy = "^2.2.3"
+entsoe-py = "^0.6.18"
+pandas = "^2.2.3"
+matplotlib = "^3.10.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
