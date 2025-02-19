@@ -6,7 +6,7 @@ authors = ["Pavel Holman <holmapav@fit.cvut.cz>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.13"
 numpy = "^2.2.3"
 entsoe-py = "^0.6.18"
 pandas = "^2.2.3"
