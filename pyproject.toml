@@ -12,6 +12,7 @@ entsoe-py = "^0.6.18"
 pandas = "^2.2.3"
 matplotlib = "^3.10.0"
 pandera = "^0.22.1"
+python-dotenv = "^1.0.1"
 
 
 [build-system]
