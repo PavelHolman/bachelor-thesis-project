@@ -12,30 +12,50 @@ DAY_AHEAD_URL = "https://www.ote-cr.cz/en/short-term-markets/electricity/day-ahe
 INTRA_DAY_URL = "https://www.ote-cr.cz/en/short-term-markets/electricity/intra-day-market/@@chart-data?report_date={date}&amp;time_resolution=PT15M"
 
 
-def fetch_day_ahead_data(date: pd.Timestamp) -> Optional[pd.DataFrame]:
+def fetch_day_ahead_data(start: pd.Timestamp, end: pd.Timestamp) -> pd.DataFrame:
     def time_to_delta(time: Series[int]) -> Series[pd.Timedelta]:
         return pd.to_timedelta(time, unit="h")
 
-    return _get_ote_day_data(
+    return _get_ote_data(
         url=DAY_AHEAD_URL,
         prefix="DA",
         cache_dir=DAY_AHEAD_DIR,
-        date=date,
+        start=start,
+        end=end,
         time_to_delta=time_to_delta
     )
 
 
-def fetch_intra_day_data(date: pd.Timestamp) -> Optional[pd.DataFrame]:
+def fetch_intra_day_data(start: pd.Timestamp, end: pd.Timestamp) -> Optional[pd.DataFrame]:
     def time_to_delta(time: Series[int]) -> Series[pd.Timedelta]:
         return pd.to_timedelta(15 * time, unit="m")
 
-    return _get_ote_day_data(
+    return _get_ote_data(
         url=INTRA_DAY_URL,
         prefix="ID",
         cache_dir=INTRA_DAY_DIR,
-        date=date,
+        start=start,
+        end=end,
         time_to_delta=time_to_delta
     )
+
+
+def _get_ote_data(
+        url: str,
+        prefix: str,
+        cache_dir: str,
+        start: pd.Timestamp,
+        end: pd.Timestamp,
+        time_to_delta: Callable[[Series[int]], Series[pd.Timedelta]]
+) -> pd.DataFrame:
+    start, end = start.tz_localize("Europe/Prague"), end.tz_localize("Europe/Prague")
+    dataframes = []
+
+    for date in pd.date_range(start, end, inclusive="left"):
+        if df := _get_ote_day_data(url, prefix, cache_dir, date, time_to_delta):
+            dataframes.append(df)
+
+    return pd.concat(dataframes)
 
 
 def _get_ote_day_data(
