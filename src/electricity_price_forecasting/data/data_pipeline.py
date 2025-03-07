@@ -12,7 +12,11 @@ from utils import PROCESSED_DATA_DIR
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 
-def fetch_data(start: pd.Timestamp, end: pd.Timestamp):
+def fetch_data(start: pd.Timestamp, end: pd.Timestamp) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    if start >= end:
+        logging.error("Start date must be before end date")
+        raise ValueError("Start date must be before end date")
+
     logging.info("Fetching 'CZ' data from ENTSO-E...")
     load_forecast_df = fetch_load_forecast("CZ", start, end)
     generation_forecast_df = fetch_generation_forecast("CZ", start, end)
