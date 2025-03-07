@@ -28,10 +28,9 @@ def fetch_data(start: pd.Timestamp, end: pd.Timestamp):
         load_forecast_df, generation_forecast_df, wind_solar_forecast_df, day_ahead_df, intra_day_df, weather_df
     )
 
-    merged_df.to_csv(os.path.join(PROCESSED_DATA_DIR, "merged.csv"), index=False)
-    logging.info("Data saved to 'merged.csv'")
-
     merged_df.index = pd.to_datetime(merged_df.index, utc=True)
+    merged_df.to_csv(os.path.join(PROCESSED_DATA_DIR, "merged.csv"))
+    logging.info("Data saved to 'merged.csv'")
 
     quarterly_df = quarterly_aggregate(merged_df)
     quarterly_df.to_csv(os.path.join(PROCESSED_DATA_DIR, "quarterly.csv"))
