@@ -52,7 +52,7 @@ def _get_ote_data(
     dataframes = []
 
     for date in pd.date_range(start, end, inclusive="left"):
-        if df := _get_ote_day_data(url, prefix, cache_dir, date, time_to_delta):
+        if (df := _get_ote_day_data(url, prefix, cache_dir, date, time_to_delta)) is not None:
             dataframes.append(df)
 
     return pd.concat(dataframes)
@@ -68,7 +68,7 @@ def _get_ote_day_data(
     path = os.path.join(cache_dir, f"{prefix}_{date.date()}.csv")
 
     if os.path.exists(path):
-        return pd.read_csv(path)
+        return pd.read_csv(path, index_col=0, parse_dates=True)
 
     if (df := _fetch_ote_day_data(url, prefix, date, time_to_delta)) is not None:
         if date.date() < pd.Timestamp.now().date():
