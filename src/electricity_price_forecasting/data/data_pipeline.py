@@ -2,9 +2,11 @@ import os
 import logging
 import pandas as pd
 from functools import reduce
-from fetch_entsoe import fetch_load_forecast, fetch_generation_forecast, fetch_wind_and_solar_forecast
-from fetch_ote_cr import fetch_day_ahead_data, fetch_intra_day_data
-from fetch_weather import fetch_weather_data
+
+from electricity_price_forecasting.data.fetch_entsoe import fetch_load_forecast, fetch_generation_forecast, \
+    fetch_wind_and_solar_forecast
+from electricity_price_forecasting.data.fetch_ote_cr import fetch_day_ahead_data, fetch_intra_day_data
+from electricity_price_forecasting.data.fetch_weather import fetch_weather_data
 from utils import PROCESSED_DATA_DIR
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
