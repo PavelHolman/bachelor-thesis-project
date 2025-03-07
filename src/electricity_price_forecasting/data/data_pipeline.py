@@ -46,6 +46,8 @@ def fetch_data(start: pd.Timestamp, end: pd.Timestamp) -> tuple[pd.DataFrame, pd
     hourly_df.to_csv(os.path.join(PROCESSED_DATA_DIR, "hourly.csv"))
     logging.info("Hourly data saved to 'hourly.csv'")
 
+    return merged_df, quarterly_df, hourly_df
+
 
 def merge_data(*dataframes: pd.DataFrame) -> pd.DataFrame:
     return reduce(lambda left, right: pd.merge(left, right, how="outer", left_index=True, right_index=True), dataframes)
