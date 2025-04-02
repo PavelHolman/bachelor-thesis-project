@@ -5,12 +5,21 @@ import openmeteo_requests
 import requests_cache
 import pandas as pd
 from retry_requests import retry
+from functools import reduce
 
 from utils import WEATHER_DATA_DIR
 
 
 def fetch_weather_data(start: pd.Timestamp, end: pd.Timestamp) -> pd.DataFrame:
-    return _get_weather_data(52.52, 13.41, start, end)
+    dataframes = []
+
+    for latitude in range(45, 56):
+        for longitude in range(5, 24):
+            data = _get_weather_data(latitude, longitude, start, end)
+            data.columns = [f"{latitude}_{longitude}_{col}" for col in data.columns]
+            dataframes.append(data)
+
+    return reduce(lambda left, right: pd.merge(left, right, how="outer", left_index=True, right_index=True), dataframes)
 
 
 def _get_weather_data(latitude: float, longitude: float, start: pd.Timestamp, end: pd.Timestamp) -> pd.DataFrame:
@@ -23,7 +32,7 @@ def _get_weather_data(latitude: float, longitude: float, start: pd.Timestamp, en
         if not os.path.exists(cache_file):
             query_start, query_end = date, min(date + pd.Timedelta(days=30), end)
 
-            logging.info(f"Fetching weather data between {query_start} and {query_end}")
+            logging.info(f"Fetching weather data between {query_start} and {query_end} at {latitude}, {longitude}")
             df = _fetch_weather_data(latitude, longitude, query_start, query_end)
 
             for query_date in pd.date_range(query_start, query_end, inclusive="left"):
@@ -50,6 +59,7 @@ def _fetch_weather_data(latitude: float, longitude: float, start: pd.Timestamp, 
         "start_date": start.date(),
         "end_date": end.date(),
         "minutely_15": [
+            "temperature_2m",
             "rain",
             "wind_speed_10m",
             "wind_speed_80m",
@@ -58,7 +68,6 @@ def _fetch_weather_data(latitude: float, longitude: float, start: pd.Timestamp, 
             "wind_gusts_10m",
             "direct_radiation"
         ],
-        "hourly": "direct_radiation",
         "timezone": "Europe/Prague"
     }
     responses = openmeteo.weather_api(url, params=params)
@@ -66,13 +75,14 @@ def _fetch_weather_data(latitude: float, longitude: float, start: pd.Timestamp, 
     response = responses[0]
 
     minutely_15 = response.Minutely15()
-    minutely_15_rain = minutely_15.Variables(0).ValuesAsNumpy()
-    minutely_15_wind_speed_10m = minutely_15.Variables(1).ValuesAsNumpy()
-    minutely_15_wind_speed_80m = minutely_15.Variables(2).ValuesAsNumpy()
-    minutely_15_wind_direction_10m = minutely_15.Variables(3).ValuesAsNumpy()
-    minutely_15_wind_direction_80m = minutely_15.Variables(4).ValuesAsNumpy()
-    minutely_15_wind_gusts_10m = minutely_15.Variables(5).ValuesAsNumpy()
-    minutely_15_direct_radiation = minutely_15.Variables(6).ValuesAsNumpy()
+    minutely_15_temperature_2m = minutely_15.Variables(0).ValuesAsNumpy()
+    minutely_15_rain = minutely_15.Variables(1).ValuesAsNumpy()
+    minutely_15_wind_speed_10m = minutely_15.Variables(2).ValuesAsNumpy()
+    minutely_15_wind_speed_80m = minutely_15.Variables(3).ValuesAsNumpy()
+    minutely_15_wind_direction_10m = minutely_15.Variables(4).ValuesAsNumpy()
+    minutely_15_wind_direction_80m = minutely_15.Variables(5).ValuesAsNumpy()
+    minutely_15_wind_gusts_10m = minutely_15.Variables(6).ValuesAsNumpy()
+    minutely_15_direct_radiation = minutely_15.Variables(7).ValuesAsNumpy()
 
     index = pd.date_range(
         start=pd.to_datetime(minutely_15.Time(), unit="s", utc=True),
@@ -82,6 +92,7 @@ def _fetch_weather_data(latitude: float, longitude: float, start: pd.Timestamp, 
     ).tz_convert("Europe/Prague")
 
     minutely_15_data = {
+        "temperature_2m": minutely_15_temperature_2m,
         "rain": minutely_15_rain,
         "wind_speed_10m": minutely_15_wind_speed_10m,
         "wind_speed_80m": minutely_15_wind_speed_80m,

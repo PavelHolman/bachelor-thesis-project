@@ -76,4 +76,4 @@ def hourly_aggregate(df: pd.DataFrame) -> pd.DataFrame:
 
 
 if __name__ == "__main__":
-    fetch_data(pd.Timestamp("2024-07-01"), pd.Timestamp("2025-03-06"))
+    fetch_data(pd.Timestamp("2024-07-01"), pd.Timestamp("2025-03-30"))
