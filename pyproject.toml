@@ -18,6 +18,9 @@ requests-cache = "^1.2.1"
 retry-requests = "^2.0.0"
 notebook = "^7.3.2"
 scikit-learn = "^1.6.1"
+keras = "^3.9.1"
+torch = "^2.6.0"
+tqdm = "^4.67.1"
 
 
 [build-system]
