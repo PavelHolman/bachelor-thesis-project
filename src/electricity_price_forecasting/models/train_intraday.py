@@ -27,7 +27,7 @@ def train_intraday_model(
             known_covariates_names=known_cov,
             freq="15min",
             prediction_length=24 * 4,
-            eval_metric="MAPE",
+            eval_metric="MAE",
             path=path,
             verbosity=2,
         ).fit(train, val, hyperparameters=hyperparameters)
@@ -35,10 +35,12 @@ def train_intraday_model(
 
 def main():
     df = pd.read_csv(os.path.join(PROCESSED_DATA_DIR, "merged.csv"), index_col=0, parse_dates=True)
+    df.ffill(inplace=True)
+    df.bfill(inplace=True)
     train, val, test = train_val_test_split(df)
     logging.info(f"Train, val, test split: {train.shape}, {val.shape}, {test.shape}")
     predictor = train_intraday_model(train, val, "merged")
-    predictor.evaluate(test, metrics=["MAPE", "MAE", "RMSE"], display=True)
+    predictor.evaluate(test, metrics=["MAE", "RMSE", "MAPE"], display=True)
     predictor.leaderboard(test, display=True)
 
 
