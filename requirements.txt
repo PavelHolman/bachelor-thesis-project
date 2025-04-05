@@ -11,3 +11,6 @@ requests-cache==1.2.1
 retry-requests==2.0.0
 scipy==1.15.2
 autogluon==1.2
+
+--extra-index-url=https://download.pytorch.org/whl/cu121
+torch==2.5.1
