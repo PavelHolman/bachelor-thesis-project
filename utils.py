@@ -2,6 +2,7 @@ import os
 from dotenv import load_dotenv
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_DIR = os.path.join(ROOT_DIR, 'models/')
 DATA_DIR = os.path.join(ROOT_DIR, "data/")
 
 # Raw data
