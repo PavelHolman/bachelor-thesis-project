@@ -1,13 +1,13 @@
 entsoe-py==0.6.18
 matplotlib==3.10.0
 notebook==7.3.2
-numpy==2.2.3
 openmeteo-requests==1.3.0
 openmeteo-sdk==1.19.0
 pandas==2.2.3
 pandera==0.22.1
 python-dotenv==1.0.1
 requests==2.32.3
+requests-cache==1.2.1
 retry-requests==2.0.0
 scipy==1.15.2
 autogluon==1.2
