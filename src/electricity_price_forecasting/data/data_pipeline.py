@@ -3,10 +3,9 @@ import logging
 import pandas as pd
 from functools import reduce
 
-from electricity_price_forecasting.data.fetch_entsoe import fetch_load_forecast, fetch_generation_forecast, \
-    fetch_wind_and_solar_forecast
-from electricity_price_forecasting.data.fetch_ote_cr import fetch_day_ahead_data, fetch_intra_day_data
-from electricity_price_forecasting.data.fetch_weather import fetch_weather_data
+from fetch_entsoe import fetch_load_forecast, fetch_generation_forecast, fetch_wind_and_solar_forecast
+from fetch_ote_cr import fetch_day_ahead_data, fetch_intra_day_data
+from fetch_weather import fetch_weather_data
 from utils import PROCESSED_DATA_DIR
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
@@ -76,4 +75,4 @@ def hourly_aggregate(df: pd.DataFrame) -> pd.DataFrame:
 
 
 if __name__ == "__main__":
-    fetch_data(pd.Timestamp("2024-07-01"), pd.Timestamp("2025-03-30"))
+    fetch_data(pd.Timestamp("2024-07-01"), pd.Timestamp("2025-04-01"))
