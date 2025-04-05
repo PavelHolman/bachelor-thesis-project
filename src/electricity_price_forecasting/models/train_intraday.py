@@ -12,7 +12,8 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error, mean_absolu
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 
-def train_intraday_model(df: pd.DataFrame, model_cache: str):
+def train_intraday_model(df: pd.DataFrame, model_cache: str, known: list[str] = None, hyperparameters: dict = None):
+    df = df.copy()
     df["item_id"] = "intraday"
     df["timestamp"] = df.index.tz_convert(None)
 
@@ -29,13 +30,13 @@ def train_intraday_model(df: pd.DataFrame, model_cache: str):
         logging.info(f"Training model from {os.path.join(MODEL_DIR, model_cache)}")
         predictor = TimeSeriesPredictor(
             target="ID Weighted average of the prices (EUR/MWh)",
-            # TODO known_covariates_names=[],
+            known_covariates_names=known,
             freq="15min",
             prediction_length=24 * 4,
             eval_metric="MAPE",
             path=os.path.join(MODEL_DIR, model_cache),
             verbosity=2,
-        ).fit(train, val)
+        ).fit(train, val, hyperparameters=hyperparameters)
 
     y_pred, y_test = [], []
     i = 0
