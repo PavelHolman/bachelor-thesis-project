@@ -1,3 +1,4 @@
+import logging
 import os
 
 import pandas as pd
@@ -8,8 +9,10 @@ from autogluon.timeseries import TimeSeriesDataFrame, TimeSeriesPredictor
 from sklearn.metrics import mean_squared_error, mean_absolute_error, mean_absolute_percentage_error, r2_score, \
     root_mean_squared_error
 
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
-def train_intraday_model(df: pd.DataFrame) -> None:
+
+def train_intraday_model(df: pd.DataFrame, model_cache: str):
     df["item_id"] = "intraday"
     df["timestamp"] = df.index.tz_convert(None)
 
@@ -17,25 +20,29 @@ def train_intraday_model(df: pd.DataFrame) -> None:
     train = TimeSeriesDataFrame.from_data_frame(train)
     val = TimeSeriesDataFrame.from_data_frame(val)
     test = TimeSeriesDataFrame.from_data_frame(test)
+    logging.info(f"Train, val, test split: {train.shape}, {val.shape}, {test.shape}")
 
     try:
-        predictor = TimeSeriesPredictor.load(os.path.join(MODEL_DIR, "autogluon_id"))
+        logging.info(f"Loading model from {os.path.join(MODEL_DIR, model_cache)}")
+        predictor = TimeSeriesPredictor.load(os.path.join(MODEL_DIR, model_cache))
     except FileNotFoundError:
+        logging.info(f"Training model from {os.path.join(MODEL_DIR, model_cache)}")
         predictor = TimeSeriesPredictor(
             target="ID Weighted average of the prices (EUR/MWh)",
             # TODO known_covariates_names=[],
             freq="15min",
             prediction_length=24 * 4,
             eval_metric="MAPE",
-            path=os.path.join(MODEL_DIR, "autogluon_id"),
+            path=os.path.join(MODEL_DIR, model_cache),
             verbosity=2,
         ).fit(train, val)
 
     y_pred, y_test = [], []
     i = 0
+    logging.info(f"Predicting for {len(test)} rows")
     while True:
         try:
-            i_test = test.iloc[24 * 4 * i:24 * 4 * (i + 1)]
+            i_test = df.iloc[len(train) + len(val) + 24 * 4 * (i - 7):len(train) + len(val) + 24 * 4 * i]
 
             y_pred.append(predictor.predict(i_test))
             y_test.append(i_test["ID Weighted average of the prices (EUR/MWh)"])
@@ -66,4 +73,4 @@ def train_intraday_model(df: pd.DataFrame) -> None:
 
 if __name__ == "__main__":
     df = pd.read_csv(os.path.join(PROCESSED_DATA_DIR, "merged.csv"), index_col=0, parse_dates=True)
-    train_intraday_model(df)
+    train_intraday_model(df, "intraday")
