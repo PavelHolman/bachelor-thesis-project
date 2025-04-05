@@ -26,7 +26,7 @@ def train_day_ahead_model(
             target="DA Price (EUR/MWh)",
             known_covariates_names=known_cov,
             freq="h",
-            prediction_length=24,
+            prediction_length=7 * 24,
             eval_metric="MAE",
             path=path,
             verbosity=2,
