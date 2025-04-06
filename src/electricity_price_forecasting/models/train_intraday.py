@@ -3,10 +3,8 @@ import os
 
 import pandas as pd
 from data_split import train_val_test_split
-from src.electricity_price_forecasting.features.generate_intraday_features import generate_intraday_lag_features, \
-    generate_intraday_rolling_features
-from src.electricity_price_forecasting.features.generate_time_features import generate_time_features
-from utils import PROCESSED_DATA_DIR, INTRADAY_MODEL_DIR
+from src.electricity_price_forecasting.features.full_intraday import full_intraday
+from utils import INTRADAY_MODEL_DIR
 from autogluon.timeseries import TimeSeriesDataFrame, TimeSeriesPredictor
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
@@ -97,11 +95,5 @@ def train_intraday(df: pd.DataFrame) -> tuple[TimeSeriesPredictor, dict[str, flo
 
 
 if __name__ == "__main__":
-    df = pd.read_csv(os.path.join(PROCESSED_DATA_DIR, "merged.csv"), index_col=0, parse_dates=True)
-    df.ffill(inplace=True)
-    df.bfill(inplace=True)
-    generate_intraday_lag_features(df)
-    generate_intraday_rolling_features(df)
-    generate_time_features(df)
-    df = df.copy()
+    df = full_intraday()
     train_intraday(df)

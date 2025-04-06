@@ -3,11 +3,9 @@ import os
 
 import pandas as pd
 
-from src.electricity_price_forecasting.features.generate_day_ahead_features import generate_day_ahead_lag_features, \
-    generate_day_ahead_rolling_features
-from src.electricity_price_forecasting.features.generate_time_features import generate_time_features
+from src.electricity_price_forecasting.features.full_day_ahead import full_day_ahead_features
 from src.electricity_price_forecasting.models.data_split import train_val_test_split
-from utils import DAY_AHEAD_MODEL_DIR, PROCESSED_DATA_DIR
+from utils import DAY_AHEAD_MODEL_DIR
 from autogluon.timeseries import TimeSeriesDataFrame, TimeSeriesPredictor
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
@@ -94,10 +92,5 @@ def train_day_ahead(df: pd.DataFrame) -> tuple[TimeSeriesPredictor, dict[str, fl
 
 
 if __name__ == "__main__":
-    df = pd.read_csv(os.path.join(PROCESSED_DATA_DIR, "quarterly.csv"), index_col=0, parse_dates=True)
-    df.drop(columns=[col for col in df.columns if "ID" in col], inplace=True)
-    generate_day_ahead_lag_features(df)
-    generate_day_ahead_rolling_features(df)
-    generate_time_features(df)
-    df = df.copy()
+    df = full_day_ahead_features()
     train_day_ahead(df)
