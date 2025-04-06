@@ -8,7 +8,7 @@ def generate_time_features(df: pd.DataFrame) -> pd.DataFrame:
     df["month"] = df.index.month
     df["year"] = df.index.year
 
-    cz_holidays = holidays.country_holidays("CZ", years=df.index.year.unique())
-    df['is_holiday'] = df.index.date.isin(cz_holidays)
+    cz_holidays = holidays.country_holidays("CZ", years=df.index.year.unique()).keys()
+    df['is_holiday'] = [(x in cz_holidays) for x in df.index.date]
 
     return df
