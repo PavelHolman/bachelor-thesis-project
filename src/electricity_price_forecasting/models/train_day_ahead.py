@@ -47,17 +47,29 @@ DA_MODELS = {
     "AutoARIMA": {},
     "DirectTabular": {},
     "RecursiveTabular": {},
-    "DeepAR": {},
     "Chronos": {},
 }
 
-DA_KNOWN_COV = None
+TIME_FEATURES = ["hour_of_day", "day_of_week", "month", "year", "is_holiday"]
+WEATHER_FEATURES = [f"{lat}_{long}_{col}" for lat in range(45, 56) for long in range(5, 24) for col in [
+    "temperature_2m",
+    "rain",
+    "wind_speed_10m",
+    "wind_speed_80m",
+    "wind_direction_10m",
+    "wind_direction_80m",
+    "wind_gusts_10m",
+    "direct_radiation"]]
+WEATHER_FEATURES = [f"{feature} ({q})" for feature in WEATHER_FEATURES for q in [0, 15, 30, 45]]
+DA_KNOWN_COV = TIME_FEATURES + WEATHER_FEATURES
+
 
 def train_day_ahead_models(
         train: TimeSeriesDataFrame,
-        val: TimeSeriesDataFrame
+        val: TimeSeriesDataFrame,
+        model_cache: str = "day_ahead",
 ) -> TimeSeriesPredictor:
-    return train_day_ahead_model(train, val, "day_ahead", known_cov=DA_KNOWN_COV, hyperparameters=DA_MODELS)
+    return train_day_ahead_model(train, val, model_cache, known_cov=DA_KNOWN_COV, hyperparameters=DA_MODELS)
 
 
 def evaluate_day_ahead_model(
@@ -73,17 +85,19 @@ def evaluate_day_ahead_model(
     return results, leaderboard
 
 
-def train_day_ahead(df: pd.DataFrame):
+def train_day_ahead(df: pd.DataFrame) -> tuple[TimeSeriesPredictor, dict[str, float], pd.DataFrame]:
     train, val, test = train_val_test_split(df)
     logging.info(f"Train, val, test split: {train.shape}, {val.shape}, {test.shape}")
     predictor = train_day_ahead_models(train, val)
-    evaluate_day_ahead_model(predictor, test)
+    results, leaderboard = evaluate_day_ahead_model(predictor, test)
+    return predictor, results, leaderboard
 
 
 if __name__ == "__main__":
-    df = pd.read_csv(os.path.join(PROCESSED_DATA_DIR, "hourly.csv"), index_col=0, parse_dates=True)
+    df = pd.read_csv(os.path.join(PROCESSED_DATA_DIR, "quarterly.csv"), index_col=0, parse_dates=True)
     df.drop(columns=[col for col in df.columns if "ID" in col], inplace=True)
     generate_lag_day_ahead_features(df)
     generate_rolling_day_ahead_features(df)
     generate_time_features(df)
+    df = df.copy()
     train_day_ahead(df)
