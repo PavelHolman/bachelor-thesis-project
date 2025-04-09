@@ -3,36 +3,10 @@ import os
 
 import pandas as pd
 
-from src.electricity_price_forecasting.features.full_day_ahead import full_day_ahead_features
-from src.electricity_price_forecasting.models.data_split import train_val_test_split
 from utils import DAY_AHEAD_MODEL_DIR
 from autogluon.timeseries import TimeSeriesDataFrame, TimeSeriesPredictor
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
-
-
-def train_day_ahead_model(
-        train: TimeSeriesDataFrame,
-        val: TimeSeriesDataFrame,
-        model_cache: str,
-        known_cov: list[str] = None,
-        hyperparameters: dict = None
-) -> TimeSeriesPredictor:
-    path = os.path.join(DAY_AHEAD_MODEL_DIR, model_cache)
-    try:
-        logging.info(f"Loading model from {path}")
-        return TimeSeriesPredictor.load(path)
-    except FileNotFoundError:
-        logging.info(f"Model not found, training a new model")
-        return TimeSeriesPredictor(
-            target="DA Price (EUR/MWh)",
-            known_covariates_names=[x for x in known_cov if x in train.columns] if known_cov else None,
-            freq="h",
-            prediction_length=7 * 24,
-            eval_metric="MAE",
-            path=path,
-            verbosity=2,
-        ).fit(train, val, hyperparameters=hyperparameters)
 
 
 DA_MODELS = {
@@ -62,12 +36,39 @@ WEATHER_FEATURES = [f"{feature} ({q})" for feature in WEATHER_FEATURES for q in 
 DA_KNOWN_COV = TIME_FEATURES + WEATHER_FEATURES
 
 
+def train_day_ahead_model(
+        train: TimeSeriesDataFrame,
+        val: TimeSeriesDataFrame,
+        model_cache: str,
+        known_cov: list[str] = None,
+        hyperparameters: dict = None
+) -> TimeSeriesPredictor:
+    known_cov = known_cov or DA_KNOWN_COV
+    hyperparameters = hyperparameters or DA_MODELS
+
+    path = os.path.join(DAY_AHEAD_MODEL_DIR, model_cache)
+    try:
+        logging.info(f"Loading model from {path}")
+        return TimeSeriesPredictor.load(path)
+    except FileNotFoundError:
+        logging.info(f"Model not found, training a new model")
+        return TimeSeriesPredictor(
+            target="DA Price (EUR/MWh)",
+            known_covariates_names=[x for x in known_cov if x in train.columns] if known_cov else None,
+            freq="h",
+            prediction_length=7 * 24,
+            eval_metric="MAE", # TODO: Maximum metric
+            path=path,
+            verbosity=2,
+        ).fit(train, val, hyperparameters=hyperparameters)
+
+
 def train_day_ahead_models(
         train: TimeSeriesDataFrame,
         val: TimeSeriesDataFrame,
         model_cache: str = "day_ahead",
 ) -> TimeSeriesPredictor:
-    return train_day_ahead_model(train, val, model_cache, known_cov=DA_KNOWN_COV, hyperparameters=DA_MODELS)
+    return train_day_ahead_model(train, val, model_cache)
 
 
 def evaluate_day_ahead_model(
@@ -83,14 +84,11 @@ def evaluate_day_ahead_model(
     return results, leaderboard
 
 
-def train_day_ahead(df: pd.DataFrame) -> tuple[TimeSeriesPredictor, dict[str, float], pd.DataFrame]:
-    train, val, test = train_val_test_split(df)
-    logging.info(f"Train, val, test split: {train.shape}, {val.shape}, {test.shape}")
+def train_day_ahead(
+        train: TimeSeriesDataFrame,
+        val: TimeSeriesDataFrame,
+        select: TimeSeriesDataFrame,
+) -> tuple[TimeSeriesPredictor, dict[str, float], pd.DataFrame]:
     predictor = train_day_ahead_models(train, val)
-    results, leaderboard = evaluate_day_ahead_model(predictor, test)
+    results, leaderboard = evaluate_day_ahead_model(predictor, select)
     return predictor, results, leaderboard
-
-
-if __name__ == "__main__":
-    df = full_day_ahead_features()
-    train_day_ahead(df)
