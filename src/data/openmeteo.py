@@ -1,0 +1,104 @@
+import logging
+import os
+from typing import Tuple
+
+import pandas as pd
+
+from utils import RAW_DATA_DIR
+
+OPENMETEO_PATH = os.path.join(RAW_DATA_DIR, "openmeteo.csv")
+
+
+def load_openmeteo_data(start: pd.Timestamp, end: pd.Timestamp) -> pd.DataFrame:
+    if os.path.isfile(OPENMETEO_PATH):
+        logging.info(f"Loading Open Meteo data from {OPENMETEO_PATH}")
+        df = pd.read_csv(OPENMETEO_PATH, parse_dates=["timestamp"], index_col="timestamp")
+    else:
+        df = pd.DataFrame()
+
+    full_range = pd.date_range(start, end, freq='15min', tz="UTC", inclusive="left")
+    existing_range = df.index
+    missing_range = full_range.difference(existing_range)
+
+    if not missing_range.empty:
+        missing_start = missing_range.min()
+        missing_end = missing_range.max()
+        coords = [(lat, long) for lat in range(45, 56) for long in range(5, 24)]
+        new_df = __fetch_openmeteo_data(missing_start, missing_end, coords)
+        df = pd.concat([df, new_df])
+        df = df[~df.index.duplicated(keep='last')]
+        df.sort_index(inplace=True)
+
+        logging.info(f"Saving Open Meteo data to {OPENMETEO_PATH}")
+        df.to_csv(OPENMETEO_PATH)
+
+    return df.loc[full_range]
+
+
+def __fetch_openmeteo_data(start: pd.Timestamp, end: pd.Timestamp, coords: list[Tuple[float, float]]) -> pd.DataFrame:
+    logging.info(f"Fetching Open Meteo data from {start} to {end} for {len(coords)} coordinates")
+    import openmeteo_requests
+
+    import requests_cache
+    from retry_requests import retry
+
+    cache_session = requests_cache.CachedSession('.cache', expire_after=3600)
+    retry_session = retry(cache_session, retries=5, backoff_factor=0.2)
+    openmeteo = openmeteo_requests.Client(session=retry_session)
+
+    url = "https://historical-forecast-api.open-meteo.com/v1/forecast"
+    params = {
+        "latitude": [lat for (lat, _) in coords],
+        "longitude": [long for (_, long) in coords],
+        "start_date": start.date(),
+        "end_date": end.date(),
+        "minutely_15": [
+            "temperature_2m", "wind_speed_80m", "rain", "wind_direction_10m", "wind_direction_80m", "wind_speed_10m",
+            "wind_gusts_10m", "shortwave_radiation", "direct_radiation", "diffuse_radiation"
+        ]
+    }
+    responses = openmeteo.weather_api(url, params=params)
+
+    dataframes = []
+
+    for response, (lat, long) in zip(responses, coords):
+        minutely_15 = response.Minutely15()
+        minutely_15_temperature_2m = minutely_15.Variables(0).ValuesAsNumpy()
+        minutely_15_wind_speed_80m = minutely_15.Variables(1).ValuesAsNumpy()
+        minutely_15_rain = minutely_15.Variables(2).ValuesAsNumpy()
+        minutely_15_wind_direction_10m = minutely_15.Variables(3).ValuesAsNumpy()
+        minutely_15_wind_direction_80m = minutely_15.Variables(4).ValuesAsNumpy()
+        minutely_15_wind_speed_10m = minutely_15.Variables(5).ValuesAsNumpy()
+        minutely_15_wind_gusts_10m = minutely_15.Variables(6).ValuesAsNumpy()
+        minutely_15_shortwave_radiation = minutely_15.Variables(7).ValuesAsNumpy()
+        minutely_15_direct_radiation = minutely_15.Variables(8).ValuesAsNumpy()
+        minutely_15_diffuse_radiation = minutely_15.Variables(9).ValuesAsNumpy()
+
+        minutely_15_data = {
+            "timestamp": pd.date_range(
+                start=pd.to_datetime(minutely_15.Time(), unit="s", utc=True),
+                end=pd.to_datetime(minutely_15.TimeEnd(), unit="s", utc=True),
+                freq=pd.Timedelta(seconds=minutely_15.Interval()),
+                inclusive="left"
+            ),
+            "temperature_2m": minutely_15_temperature_2m,
+            "wind_speed_80m": minutely_15_wind_speed_80m,
+            "rain": minutely_15_rain,
+            "wind_direction_10m": minutely_15_wind_direction_10m,
+            "wind_direction_80m": minutely_15_wind_direction_80m,
+            "wind_speed_10m": minutely_15_wind_speed_10m,
+            "wind_gusts_10m": minutely_15_wind_gusts_10m,
+            "shortwave_radiation": minutely_15_shortwave_radiation,
+            "direct_radiation": minutely_15_direct_radiation,
+            "diffuse_radiation": minutely_15_diffuse_radiation
+        }
+
+        minutely_15_dataframe = pd.DataFrame(data=minutely_15_data)
+        minutely_15_dataframe.set_index("timestamp", inplace=True)
+        minutely_15_dataframe.rename(
+            columns=lambda col: col if col == "timestamp" else f"{lat}_{long}_{col}",
+            inplace=True)
+        dataframes.append(minutely_15_dataframe)
+
+    df = pd.concat(dataframes, axis=1)
+    return df
