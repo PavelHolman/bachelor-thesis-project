@@ -1,0 +1,28 @@
+import logging
+import os
+
+import pandas as pd
+
+from src.data.load_all_data import load_all_data
+from src.features.generate_day_ahead_features import generate_day_ahead_features
+from src.features.generate_time_features import generate_time_features
+from utils import PROCESSED_DATA_DIR
+
+
+def load_day_ahead_dataset(start: pd.Timestamp, end: pd.Timestamp) -> pd.DataFrame:
+    logging.info("Loading day ahead data")
+    df = load_all_data(start, end)
+    df.drop(columns=[
+        "ID Weighted average of the prices (EUR/MWh)",
+        "ID Minimal price(EUR / MWh)",
+        "ID Maximal price(EUR / MWh)",
+        "ID Volume(MWh)"
+    ], inplace=True)
+    df.ffill(inplace=True)
+    df.bfill(inplace=True)
+    time_features = generate_time_features(df)
+    day_ahead_features = generate_day_ahead_features(df)
+    df = pd.concat([df, time_features, day_ahead_features], axis=1)
+
+    df.to_csv(os.path.join(PROCESSED_DATA_DIR, f"day_ahead_{start.date()}_{end.date()}.csv"))
+    return df
