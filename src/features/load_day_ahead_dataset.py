@@ -35,5 +35,5 @@ def load_day_ahead_dataset(start: pd.Timestamp, end: pd.Timestamp) -> pd.DataFra
 
     df.to_csv(os.path.join(PROCESSED_DATA_DIR, f"day_ahead_{start.date()}_{end.date()}.csv"))
     df["item_id"] = "day_ahead"
-    df["timestamp"] = df.index
+    df["timestamp"] = df.index.tz_convert(None)
     return df

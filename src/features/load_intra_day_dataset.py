@@ -30,5 +30,5 @@ def load_intra_day_dataset(start: pd.Timestamp, end: pd.Timestamp) -> pd.DataFra
 
     df.to_csv(os.path.join(PROCESSED_DATA_DIR, f"intra_day_{start.date()}_{end.date()}.csv"))
     df["item_id"] = "intra_day"
-    df["timestamp"] = df.index
+    df["timestamp"] = df.index.tz_convert(None)
     return df
