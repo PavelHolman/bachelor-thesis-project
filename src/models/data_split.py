@@ -16,14 +16,14 @@ def shuffled_split(
     :param eval_size: The proportion of the data to include in the evaluation set.
     :return: A tuple containing the training, validation, test, and evaluation sets as DataFrames.
     """
-    train_data = df.sample(frac=1 - (val_size + test_size + eval_size))
-    remaining_data = df.drop(train_data.index)
-    val_data = remaining_data.sample(frac=val_size / (val_size + test_size + eval_size))
-    remaining_data = remaining_data.drop(val_data.index)
-    test_data = remaining_data.sample(frac=test_size / (test_size + eval_size))
-    eval_data = remaining_data.drop(test_data.index)
+    train = df.sample(frac=1 - (val_size + test_size + eval_size))
+    remaining = df.drop(train.index)
+    val = remaining.sample(frac=val_size / (val_size + test_size + eval_size))
+    remaining = remaining.drop(val.index)
+    test = remaining.sample(frac=test_size / (test_size + eval_size))
+    evaluation = remaining.drop(test.index)
 
-    return train_data, val_data, test_data, eval_data
+    return train, val, test, evaluation
 
 
 def time_series_split(
@@ -40,9 +40,12 @@ def time_series_split(
     :param eval_cutoff: The cutoff timestamp for the evaluation set.
     :return: A tuple containing the training, validation, test, and evaluation sets as TimeSeriesDataFrames.
     """
-    train_data = TimeSeriesDataFrame.from_data_frame(df[df.index < val_cutoff])
-    val_data = TimeSeriesDataFrame.from_data_frame(df[(df.index >= val_cutoff) & (df.index < test_cutoff)])
-    test_data = TimeSeriesDataFrame.from_data_frame(df[(df.index >= test_cutoff) & (df.index < eval_cutoff)])
-    eval_data = TimeSeriesDataFrame.from_data_frame(df[df.index >= eval_cutoff])
+    df["item_id"] = 1
+    df["timestamp"] = df.index.tz_convert(None)
 
-    return train_data, val_data, test_data, eval_data
+    train = TimeSeriesDataFrame.from_data_frame(df[df["timestamp"] < val_cutoff])
+    val = TimeSeriesDataFrame.from_data_frame(df[(df["timestamp"] >= val_cutoff) & (df["timestamp"] < test_cutoff)])
+    test = TimeSeriesDataFrame.from_data_frame(df[(df["timestamp"] >= test_cutoff) & (df["timestamp"] < eval_cutoff)])
+    evaluation = TimeSeriesDataFrame.from_data_frame(df[df["timestamp"] >= eval_cutoff])
+
+    return train, val, test, evaluation
