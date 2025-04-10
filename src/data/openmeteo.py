@@ -10,6 +10,12 @@ OPENMETEO_PATH = os.path.join(RAW_DATA_DIR, "openmeteo.csv")
 
 
 def load_openmeteo_data(start: pd.Timestamp, end: pd.Timestamp) -> pd.DataFrame:
+    """
+    Load Open Meteo raw data. If the data is not available, fetch it from the Open Meteo API.
+    :param start: Timestamp to start loading data from.
+    :param end: Timestamp to stop loading data at.
+    :return: DataFrame containing the Open Meteo raw data.
+    """
     if os.path.isfile(OPENMETEO_PATH):
         logging.info(f"Loading Open Meteo data from {OPENMETEO_PATH}")
         df = pd.read_csv(OPENMETEO_PATH, parse_dates=["timestamp"], index_col="timestamp")
@@ -36,6 +42,13 @@ def load_openmeteo_data(start: pd.Timestamp, end: pd.Timestamp) -> pd.DataFrame:
 
 
 def __fetch_openmeteo_data(start: pd.Timestamp, end: pd.Timestamp, coords: list[Tuple[float, float]]) -> pd.DataFrame:
+    """
+    Fetch Open Meteo historical data for the given coordinates and time range.
+    :param start: Timestamp to start fetching data from.
+    :param end: Timestamp to stop fetching data at.
+    :param coords: List of tuples containing latitude and longitude coordinates.
+    :return: DataFrame containing the fetched data.
+    """
     logging.info(f"Fetching Open Meteo data from {start} to {end} for {len(coords)} coordinates")
     import openmeteo_requests
 
