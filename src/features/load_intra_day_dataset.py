@@ -21,4 +21,6 @@ def load_intra_day_dataset(start: pd.Timestamp, end: pd.Timestamp) -> pd.DataFra
     df = pd.concat([df, time_features, intra_day_features, day_ahead_features], axis=1)
 
     df.to_csv(os.path.join(PROCESSED_DATA_DIR, f"intra_day_{start.date()}_{end.date()}.csv"))
+    df["item_id"] = "intra_day"
+    df["timestamp"] = df.index
     return df

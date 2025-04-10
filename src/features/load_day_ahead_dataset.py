@@ -25,4 +25,6 @@ def load_day_ahead_dataset(start: pd.Timestamp, end: pd.Timestamp) -> pd.DataFra
     df = pd.concat([df, time_features, day_ahead_features], axis=1)
 
     df.to_csv(os.path.join(PROCESSED_DATA_DIR, f"day_ahead_{start.date()}_{end.date()}.csv"))
+    df["item_id"] = "day_ahead"
+    df["timestamp"] = df.index
     return df
