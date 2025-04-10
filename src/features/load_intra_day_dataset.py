@@ -11,6 +11,14 @@ from utils import PROCESSED_DATA_DIR
 
 
 def load_intra_day_dataset(start: pd.Timestamp, end: pd.Timestamp) -> pd.DataFrame:
+    """
+    Load the intraday dataset for the given date range.
+    This function loads the data, generates time-based, intraday, and day-ahead features,
+    and saves the processed data to a CSV file.
+    :param start: Timestamp to start loading data from.
+    :param end: Timestamp to stop loading data at.
+    :return: DataFrame containing the intraday data.
+    """
     logging.info("Loading intraday data")
     df = load_all_data(start, end)
     df.ffill(inplace=True)
