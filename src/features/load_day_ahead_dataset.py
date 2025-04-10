@@ -23,9 +23,9 @@ def load_day_ahead_dataset(start: pd.Timestamp, end: pd.Timestamp) -> pd.DataFra
     df = load_all_data(start, end)
     df.drop(columns=[
         "ID Weighted average of the prices (EUR/MWh)",
-        "ID Minimal price(EUR / MWh)",
-        "ID Maximal price(EUR / MWh)",
-        "ID Volume(MWh)"
+        "ID Minimal price (EUR/MWh)",
+        "ID Maximal price (EUR/MWh)",
+        "ID Volume (MWh)"
     ], inplace=True)
     df.ffill(inplace=True)
     df.bfill(inplace=True)
@@ -34,6 +34,4 @@ def load_day_ahead_dataset(start: pd.Timestamp, end: pd.Timestamp) -> pd.DataFra
     df = pd.concat([df, time_features, day_ahead_features], axis=1)
 
     df.to_csv(os.path.join(PROCESSED_DATA_DIR, f"day_ahead_{start.date()}_{end.date()}.csv"))
-    df["item_id"] = "day_ahead"
-    df["timestamp"] = df.index.tz_convert(None)
     return df

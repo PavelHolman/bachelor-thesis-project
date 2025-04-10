@@ -9,7 +9,7 @@ def generate_day_ahead_features(df: pd.DataFrame) -> pd.DataFrame:
     """
     day_ahead_df = pd.DataFrame(index=df.index)
 
-    day_ahead_series = df["ID Weighted average of the prices (EUR/MWh)"]
+    day_ahead_series = df["DA Price (EUR/MWh)"]
     intervals_per_day = int(pd.Timedelta("1D") / pd.Timedelta(df.index.inferred_freq))
 
     for lag in range(1, 7 * intervals_per_day + 1):
