@@ -2,22 +2,23 @@
 
 ### Loading and cleaning data
 
-- [ ] Load and cleanup OTE a.s. data
+- [ ] Load OTE a.s. raw data
     - [ ] DA
     - [ ] ID
-- [ ] Load and cleanup ENTSO-E data
+- [ ] Load ENTSO-E raw data
     - [ ] Generation forecast
         - [ ] Total
         - [ ] Solar
         - [ ] Wind
     - [ ] Load forecast
-- [ ] Load and cleanup Open-Meteo data
+- [ ] Load Open-Meteo raw data
     - [ ] Temperature
     - [ ] Rain
     - [ ] Wind speed
     - [ ] Wind direction
     - [ ] Wind gusts
     - [ ] Solar radiation
+- [ ] Cleanup raw data into interim data
 
 ### Feature engineering
 
