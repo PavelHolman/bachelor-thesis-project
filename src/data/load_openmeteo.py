@@ -22,7 +22,7 @@ def load_openmeteo_data(start: pd.Timestamp, end: pd.Timestamp) -> pd.DataFrame:
     else:
         df = pd.DataFrame()
 
-    full_range = pd.date_range(start, end, freq='15min', tz="UTC", inclusive="left")
+    full_range = pd.date_range(start, end, freq='15min', tz="UTC")
     existing_range = df.index
     missing_range = full_range.difference(existing_range)
 
