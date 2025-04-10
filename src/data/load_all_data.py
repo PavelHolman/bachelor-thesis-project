@@ -3,9 +3,9 @@ import os
 
 import pandas as pd
 
-from load_entsoe import load_entsoe_data
-from load_openmeteo import load_openmeteo_data
-from load_ote import load_ote_data
+from src.data.load_entsoe import load_entsoe_data
+from src.data.load_openmeteo import load_openmeteo_data
+from src.data.load_ote import load_ote_data
 from utils import INTERIM_DATA_DIR
 
 DATA_PATH = os.path.join(INTERIM_DATA_DIR, "data.csv")
