@@ -2,38 +2,37 @@
 
 ### Loading and cleaning data
 
-- [ ] Load OTE a.s. raw data
-    - [ ] DA
-    - [ ] ID
-- [ ] Load ENTSO-E raw data
-    - [ ] Generation forecast
-        - [ ] Total
-        - [ ] Solar
-        - [ ] Wind
-    - [ ] Load forecast
-- [ ] Load Open-Meteo raw data
-    - [ ] Temperature
-    - [ ] Rain
-    - [ ] Wind speed
-    - [ ] Wind direction
-    - [ ] Wind gusts
-    - [ ] Solar radiation
-- [ ] Cleanup raw data into interim data
+- [x] Load OTE a.s. raw data
+    - [x] DA
+    - [x] ID
+- [x] Load ENTSO-E raw data
+    - [x] Generation forecast
+        - [x] Solar
+        - [x] Wind
+    - [x] Load forecast
+- [x] Load Open-Meteo raw data
+    - [x] Temperature
+    - [x] Rain
+    - [x] Wind speed
+    - [x] Wind direction
+    - [x] Wind gusts
+    - [x] Solar radiation
+- [x] Merge raw data into interim data
 
 ### Feature engineering
 
-- [ ] Generate rolling ID features
-- [ ] Generate rolling DA features
-- [ ] Generate static time features
-- [ ] Datatype conversion
+- [x] Generate rolling ID features
+- [x] Generate rolling DA features
+- [x] Generate static time features
+- [x] Datatype conversion
 
 ### Prepare data for training
 
-- [ ] item_id and timestamp for AutoGluon dataset
-- [ ] Split data into training, validation, selection and test sets
-- [ ] Prepare datasets for AutoGluon
-    - [ ] DA
-    - [ ] ID
+- [x] item_id and timestamp for AutoGluon dataset
+- [x] Split data into training, validation, selection and test sets
+- [x] Prepare datasets for AutoGluon
+    - [x] DA
+    - [x] ID
 
 ### Train models
 
