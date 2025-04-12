@@ -1,10 +1,37 @@
 import logging
 
 import pandas as pd
+from autogluon.common import TabularDataset
 from autogluon.timeseries import TimeSeriesDataFrame
 
 DA_KNOWN = ["T", "WF"]
 ID_KNOWN = ["T", "WF", "DA", "PG"]
+
+
+def tabular_split(
+        df: pd.DataFrame,
+        val_cutoff: pd.Timestamp,
+        test_cutoff: pd.Timestamp,
+        eval_cutoff: pd.Timestamp,
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    """
+    Splits the DataFrame into training, validation, test and evaluation sets for tabular data.
+    :param df: The input DataFrame containing the tabular data.
+    :param val_cutoff: The cutoff timestamp for the validation set.
+    :param test_cutoff: The cutoff timestamp for the test set.
+    :param eval_cutoff: The cutoff timestamp for the evaluation set.
+    :return: A tuple containing the training, validation, test, and evaluation sets as TabularDatasets.
+    """
+    df["item_id"] = 1
+    timestamp = df.index.tz_convert(None)
+
+    train = TabularDataset(df[timestamp < val_cutoff])
+    val = TabularDataset(df[(timestamp >= val_cutoff) & (timestamp < test_cutoff)])
+    test = TabularDataset(df[(timestamp >= test_cutoff) & (timestamp < eval_cutoff)])
+    evaluation = TabularDataset(df[timestamp >= eval_cutoff])
+
+    __log_data_split_info(df, train, val, test, evaluation)
+    return train, val, test, evaluation
 
 
 def time_series_split(
