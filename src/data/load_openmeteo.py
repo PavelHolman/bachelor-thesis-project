@@ -29,7 +29,7 @@ def load_openmeteo_data(start: pd.Timestamp, end: pd.Timestamp, inclusive: Inclu
     if not missing_range.empty:
         missing_start = missing_range.min()
         missing_end = missing_range.max()
-        coords = [(lat, long) for lat in range(45, 56) for long in range(5, 24)]
+        coords = [(lat, long) for lat in range(45, 56, 2) for long in range(5, 24, 2)]
         new_df = __fetch_openmeteo_data(missing_start, missing_end, coords)
         df = pd.concat([df, new_df])
         df = df[~df.index.duplicated(keep='last')]
