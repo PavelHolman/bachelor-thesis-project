@@ -7,9 +7,19 @@ from autogluon.timeseries.metrics import TimeSeriesScorer
 from src.models.data_split import DA_KNOWN
 from utils import DAY_AHEAD_MODEL_DIR
 
-__KNOWN = ["T", "WF"]
-__MODELS = {}
-__TUNING = {}
+__MODELS = {
+    "Naive": {},
+    "SeasonalNaive": {},
+    "Average": {},
+    "SeasonalAverage": {},
+    "ETS": {},
+    "AutoETS": {},
+    "AutoARIMA": {},
+    "DirectTabular": {},
+    "RecursiveTabular": {},
+    "Chronos": {},
+}
+__TUNING = None
 
 
 def train_day_ahead_time_series(

@@ -7,8 +7,14 @@ from autogluon.tabular import TabularPredictor
 
 from utils import DAY_AHEAD_MODEL_DIR
 
-__MODELS = {}
-__TUNING = {}
+__MODELS = {
+    "RF": {},
+    "KNN": {},
+    "GBM": {},
+    "CAT": {},
+    "XGB": {}
+}
+__TUNING = None
 
 
 def train_day_ahead_tabular(
