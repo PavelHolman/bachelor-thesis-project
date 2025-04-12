@@ -1,0 +1,31 @@
+import logging
+import os
+
+import pandas as pd
+from autogluon.core.metrics import Scorer
+from autogluon.tabular import TabularPredictor
+
+from utils import INTRA_DAY_MODEL_DIR
+
+__MODELS = {}
+__TUNING = {}
+
+
+def train_intra_day_tabular(
+        train: pd.DataFrame,
+        val: pd.DataFrame,
+        metric: str | Scorer,
+) -> TabularPredictor:
+    path = os.path.join(INTRA_DAY_MODEL_DIR, "tabular_model")
+    try:
+        logging.info(f"Loading model from {path}")
+        return TabularPredictor.load(path)
+    except FileNotFoundError:
+        logging.info(f"Model not found, training a new model")
+        return TabularPredictor(
+            label="ID Weighted average of the prices (EUR/MWh)",
+            problem_type="regression",
+            eval_metric=metric,
+            path=path,
+            verbosity=2,
+        ).fit(train, val, hyperparameters=__MODELS, hyperparameter_tune_kwargs=__TUNING)
