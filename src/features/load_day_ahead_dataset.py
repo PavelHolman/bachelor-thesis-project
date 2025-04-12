@@ -27,11 +27,32 @@ def load_day_ahead_dataset(start: pd.Timestamp, end: pd.Timestamp) -> pd.DataFra
         "ID Maximal price (EUR/MWh)",
         "ID Volume (MWh)"
     ], inplace=True)
-    df.ffill(inplace=True)
-    df.bfill(inplace=True)
+    df = unfold_15_minutely_columns(df)
     time_features = generate_time_features(df)
     day_ahead_features = generate_day_ahead_features(df)
     df = pd.concat([df, time_features, day_ahead_features], axis=1)
 
     df.to_csv(os.path.join(PROCESSED_DATA_DIR, f"day_ahead_{start.date()}_{end.date()}.csv"))
     return df
+
+
+def unfold_15_minutely_columns(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.copy().sort_index()
+
+    sparse_columns = set(col for col in df.columns if df[col].isna().sum() != 0)
+    unfolded_parts = []
+
+    for col in df.columns:
+        if col in sparse_columns:
+            unfolded_parts.append(df[col])
+            continue
+        for i in range(4):
+            shifted = df[col].shift(-i)
+            shifted.name = f"{col} (T+{i * 15})"
+            unfolded_parts.append(shifted)
+
+    unfolded_df = pd.concat(unfolded_parts, axis=1)
+    result = unfolded_df.iloc[::4]
+
+    result.index.name = df.index.name or "timestamp"
+    return result
