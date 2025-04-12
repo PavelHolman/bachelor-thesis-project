@@ -25,6 +25,13 @@ def shuffled_split(
     test = remaining.sample(frac=test_size / (test_size + eval_size))
     evaluation = remaining.drop(test.index)
 
+    logging.info(
+        f"Data split: "
+        f"{len(train)} train ({len(train) / len(df)}), "
+        f"{len(val)} val ({len(val) / len(df)}), "
+        f"{len(test)} test ({len(test) / len(df)}), "
+        f"{len(evaluation)} evaluation ({len(evaluation) / len(df)})"
+    )
     return train, val, test, evaluation
 
 
@@ -50,5 +57,11 @@ def time_series_split(
     test = TimeSeriesDataFrame.from_data_frame(df[(df["timestamp"] >= test_cutoff) & (df["timestamp"] < eval_cutoff)])
     evaluation = TimeSeriesDataFrame.from_data_frame(df[df["timestamp"] >= eval_cutoff])
 
-    logging.info(f"Data split: {len(train)} train, {len(val)} val, {len(test)} test, {len(evaluation)} evaluation")
+    logging.info(
+        f"Data split: "
+        f"{len(train)} train ({len(train) / len(df)}), "
+        f"{len(val)} val ({len(val) / len(df)}), "
+        f"{len(test)} test ({len(test) / len(df)}), "
+        f"{len(evaluation)} evaluation ({len(evaluation) / len(df)})"
+    )
     return train, val, test, evaluation
