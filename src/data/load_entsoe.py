@@ -56,13 +56,13 @@ def __fetch_entsoe_data(start: pd.Timestamp, end: pd.Timestamp, country_codes: l
     dataframes = []
 
     for country_code in country_codes:
-        logging.info(f"Fetching ENTSO-E data for {country_code}")
+        logging.info(f"Fetching ENTSO-E data from {start} to {end} for {country_code}")
 
         wind_and_solar_forecast = client.query_wind_and_solar_forecast(country_code, start=start, end=end)
         load_forecast = client.query_load_forecast(country_code, start=start, end=end)
 
         forecast_dataframe = pd.concat([wind_and_solar_forecast, load_forecast], axis=1)
-        forecast_dataframe = forecast_dataframe.add_prefix(f"{country_code} ")
+        forecast_dataframe = forecast_dataframe.add_prefix(f"PG {country_code} ")
         forecast_dataframe.index.name = "timestamp"
         forecast_dataframe.index = forecast_dataframe.index.tz_convert("UTC")
         dataframes.append(forecast_dataframe)

@@ -94,22 +94,22 @@ def __fetch_openmeteo_data(start: pd.Timestamp, end: pd.Timestamp, coords: list[
                 freq=pd.Timedelta(seconds=minutely_15.Interval()),
                 inclusive="left"
             ),
-            "temperature_2m": minutely_15_temperature_2m,
-            "wind_speed_80m": minutely_15_wind_speed_80m,
-            "rain": minutely_15_rain,
-            "wind_direction_10m": minutely_15_wind_direction_10m,
-            "wind_direction_80m": minutely_15_wind_direction_80m,
-            "wind_speed_10m": minutely_15_wind_speed_10m,
-            "wind_gusts_10m": minutely_15_wind_gusts_10m,
-            "shortwave_radiation": minutely_15_shortwave_radiation,
-            "direct_radiation": minutely_15_direct_radiation,
-            "diffuse_radiation": minutely_15_diffuse_radiation
+            "Temperature (2m)": minutely_15_temperature_2m,
+            "Wind speed (80m)": minutely_15_wind_speed_80m,
+            "Rain": minutely_15_rain,
+            "Wind direction (10m)": minutely_15_wind_direction_10m,
+            "Wind direction (80m)": minutely_15_wind_direction_80m,
+            "Wind speed (10m)": minutely_15_wind_speed_10m,
+            "Wind gusts (10m)": minutely_15_wind_gusts_10m,
+            "Shortwave radiation": minutely_15_shortwave_radiation,
+            "Direct radiation": minutely_15_direct_radiation,
+            "Diffuse radiation": minutely_15_diffuse_radiation
         }
 
         minutely_15_dataframe = pd.DataFrame(data=minutely_15_data)
         minutely_15_dataframe.set_index("timestamp", inplace=True)
         minutely_15_dataframe.rename(
-            columns=lambda col: col if col == "timestamp" else f"{lat}_{long}_{col}",
+            columns=lambda col: col if col == "timestamp" else f"WF ({lat}, {long}) {col}",
             inplace=True)
         dataframes.append(minutely_15_dataframe)
 

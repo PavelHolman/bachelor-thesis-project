@@ -71,6 +71,7 @@ def __fetch_intra_day_data(start: pd.Timestamp, end: pd.Timestamp) -> pd.DataFra
     dataframes = []
 
     for date in pd.date_range(start, end + pd.Timedelta(1, "d"), freq="D"):
+        logging.info(f"Fetching OTE intraday data for {date}")
         url = INTRA_DAY_URL.format(date=date.date())
         df = _fetch_ote_data_line(url)
         df["timestamp"] = date.tz_convert(None).tz_localize("Europe/Prague") + pd.to_timedelta(15 * df["ts"], unit="m")
@@ -97,6 +98,7 @@ def __fetch_day_ahead_data(start: pd.Timestamp, end: pd.Timestamp) -> pd.DataFra
     dataframes = []
 
     for date in pd.date_range(start, end + pd.Timedelta(1, "d"), freq="D"):
+        logging.info(f"Fetching OTE day-ahead data for {date}")
         url = DAY_AHEAD_URL.format(date=date.date())
         df = _fetch_ote_data_line(url)
         df["timestamp"] = date.tz_convert(None).tz_localize("Europe/Prague") + pd.to_timedelta(df["ts"], unit="h")
@@ -118,7 +120,7 @@ def _fetch_ote_data_line(url: str) -> pd.DataFrame:
         df["ts"] = df["ts"].astype(int) - 1
         return df
 
-    logging.info(f"Fetching OTE data from {url}")
+    logging.debug(f"Fetching OTE data from {url}")
     response = requests.get(url)
     assert response.status_code == 200
     data = response.json()
