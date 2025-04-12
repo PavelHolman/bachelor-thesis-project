@@ -6,16 +6,17 @@ import pandas as pd
 from src.data.load_entsoe import load_entsoe_data
 from src.data.load_openmeteo import load_openmeteo_data
 from src.data.load_ote import load_ote_data
-from utils import INTERIM_DATA_DIR
+from utils import INTERIM_DATA_DIR, Inclusive
 
 DATA_PATH = os.path.join(INTERIM_DATA_DIR, "data.csv")
 
 
-def load_all_data(start: pd.Timestamp, end: pd.Timestamp) -> pd.DataFrame:
+def load_all_data(start: pd.Timestamp, end: pd.Timestamp, inclusive: Inclusive = "left") -> pd.DataFrame:
     """
     Load all data sources and merge them into a single DataFrame.
     :param start: Timestamp to start loading data from.
     :param end: Timestamp to stop loading data at.
+    :param inclusive: Whether to include the start and end timestamps in the range.
     :return: DataFrame containing the merged data.
     """
     if os.path.isfile(DATA_PATH):
@@ -24,16 +25,15 @@ def load_all_data(start: pd.Timestamp, end: pd.Timestamp) -> pd.DataFrame:
     else:
         df = pd.DataFrame()
 
-    full_range = pd.date_range(start, end, freq='15min', tz="UTC")
-    existing_range = df.index
-    missing_range = full_range.difference(existing_range)
+    full_range = pd.date_range(start, end, freq='15min', tz="UTC", inclusive=inclusive)
+    missing_range = full_range.difference(df.index)
 
     if not missing_range.empty:
         missing_start = missing_range.min()
         missing_end = missing_range.max()
-        df_entsoe = load_entsoe_data(missing_start, missing_end)
-        df_ote = load_ote_data(missing_start, missing_end)
-        df_openmeteo = load_openmeteo_data(missing_start, missing_end)
+        df_entsoe = load_entsoe_data(missing_start, missing_end, inclusive="both")
+        df_ote = load_ote_data(missing_start, missing_end, inclusive="both")
+        df_openmeteo = load_openmeteo_data(missing_start, missing_end, inclusive="both")
 
         new_df = pd.concat([df_entsoe, df_ote, df_openmeteo], axis=1)
         df = pd.concat([df, new_df])

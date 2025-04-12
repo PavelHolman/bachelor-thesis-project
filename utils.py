@@ -1,4 +1,6 @@
 import os
+import typing
+
 from dotenv import load_dotenv
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -28,5 +30,6 @@ os.makedirs(PROCESSED_DATA_DIR, exist_ok=True)
 # Environment variables
 
 load_dotenv()
-
 ENTSOE_API_KEY = os.getenv("ENTSOE_API_KEY")
+
+Inclusive = typing.Literal["left", "right", "both", "neither"]

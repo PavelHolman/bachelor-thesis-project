@@ -5,7 +5,7 @@ from functools import reduce
 import pandas as pd
 import requests
 
-from utils import RAW_DATA_DIR
+from utils import RAW_DATA_DIR, Inclusive
 
 OTE_PATH = os.path.join(RAW_DATA_DIR, "ote.csv")
 
@@ -13,11 +13,12 @@ DAY_AHEAD_URL = "https://www.ote-cr.cz/en/short-term-markets/electricity/day-ahe
 INTRA_DAY_URL = "https://www.ote-cr.cz/en/short-term-markets/electricity/intra-day-market/@@chart-data?report_date={date}&amp;time_resolution=PT15M"
 
 
-def load_ote_data(start: pd.Timestamp, end: pd.Timestamp) -> pd.DataFrame:
+def load_ote_data(start: pd.Timestamp, end: pd.Timestamp, inclusive: Inclusive = "left") -> pd.DataFrame:
     """
     Load OTE raw data. If the data is not available, fetch it from the OTE API.
     :param start: Timestamp to start loading data from.
     :param end: Timestamp to stop loading data at.
+    :param inclusive: Whether to include the start and end timestamps in the range.
     :return: DataFrame containing the OTE raw data.
     """
     if os.path.isfile(OTE_PATH):
@@ -26,9 +27,8 @@ def load_ote_data(start: pd.Timestamp, end: pd.Timestamp) -> pd.DataFrame:
     else:
         df = pd.DataFrame()
 
-    full_range = pd.date_range(start, end, freq='15min', tz="UTC")
-    existing_range = df.index
-    missing_range = full_range.difference(existing_range)
+    full_range = pd.date_range(start, end, freq='15min', tz="UTC", inclusive=inclusive)
+    missing_range = full_range.difference(df.index)
 
     if not missing_range.empty:
         missing_start = missing_range.min()

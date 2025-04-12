@@ -4,16 +4,17 @@ import os
 import pandas as pd
 from entsoe import EntsoePandasClient
 
-from utils import RAW_DATA_DIR, ENTSOE_API_KEY
+from utils import RAW_DATA_DIR, ENTSOE_API_KEY, Inclusive
 
 ENTSOE_PATH = os.path.join(RAW_DATA_DIR, "entsoe.csv")
 
 
-def load_entsoe_data(start: pd.Timestamp, end: pd.Timestamp) -> pd.DataFrame:
+def load_entsoe_data(start: pd.Timestamp, end: pd.Timestamp, inclusive: Inclusive = "left") -> pd.DataFrame:
     """
     Load ENTSO-E raw data. If the data is not available, fetch it from the ENTSO-E API.
     :param start: Timestamp to start loading data from.
     :param end: Timestamp to stop loading data at.
+    :param inclusive: Whether to include the start and end timestamps in the range.
     :return: DataFrame containing the ENTSO-E raw data.
     """
     if os.path.isfile(ENTSOE_PATH):
@@ -22,9 +23,8 @@ def load_entsoe_data(start: pd.Timestamp, end: pd.Timestamp) -> pd.DataFrame:
     else:
         df = pd.DataFrame()
 
-    full_range = pd.date_range(start, end, freq='15min', tz="UTC")
-    existing_range = df.index
-    missing_range = full_range.difference(existing_range)
+    full_range = pd.date_range(start, end, freq='15min', tz="UTC", inclusive=inclusive)
+    missing_range = full_range.difference(df.index)
 
     if not missing_range.empty:
         missing_start = missing_range.min()
