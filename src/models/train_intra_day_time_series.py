@@ -16,7 +16,7 @@ def train_intra_day_time_series(
         val: TimeSeriesDataFrame,
         metric: str | TimeSeriesScorer,
 ) -> TimeSeriesPredictor:
-    path = os.path.join(INTRA_DAY_MODEL_DIR, "time_series_model")
+    path = os.path.join(INTRA_DAY_MODEL_DIR, f"time_series_model_{metric}")
     try:
         logging.info(f"Loading model from {path}")
         return TimeSeriesPredictor.load(path)
