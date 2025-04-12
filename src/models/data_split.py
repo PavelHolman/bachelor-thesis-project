@@ -1,3 +1,5 @@
+import logging
+
 import pandas as pd
 from autogluon.timeseries import TimeSeriesDataFrame
 
@@ -48,4 +50,5 @@ def time_series_split(
     test = TimeSeriesDataFrame.from_data_frame(df[(df["timestamp"] >= test_cutoff) & (df["timestamp"] < eval_cutoff)])
     evaluation = TimeSeriesDataFrame.from_data_frame(df[df["timestamp"] >= eval_cutoff])
 
+    logging.info(f"Data split: {len(train)} train, {len(val)} val, {len(test)} test, {len(evaluation)} evaluation")
     return train, val, test, evaluation
