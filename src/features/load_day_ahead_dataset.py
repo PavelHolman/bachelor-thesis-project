@@ -30,7 +30,7 @@ def load_day_ahead_dataset(start: pd.Timestamp, end: pd.Timestamp) -> pd.DataFra
     df = unfold_15_minutely_columns(df)
     time_features = generate_time_features(df)
     day_ahead_features = generate_day_ahead_features(df)
-    df = pd.concat([df, time_features, day_ahead_features], axis=1)
+    df = pd.concat([df, time_features, day_ahead_features], axis=1).dropna()
 
     df.to_csv(os.path.join(PROCESSED_DATA_DIR, f"day_ahead_{start.date()}_{end.date()}.csv"))
     return df

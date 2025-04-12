@@ -26,7 +26,7 @@ def load_intra_day_dataset(start: pd.Timestamp, end: pd.Timestamp) -> pd.DataFra
     time_features = generate_time_features(df)
     intra_day_features = generate_intra_day_features(df)
     day_ahead_features = generate_day_ahead_features(df)
-    df = pd.concat([df, time_features, intra_day_features, day_ahead_features], axis=1)
+    df = pd.concat([df, time_features, intra_day_features, day_ahead_features], axis=1).dropna()
 
     df.to_csv(os.path.join(PROCESSED_DATA_DIR, f"intra_day_{start.date()}_{end.date()}.csv"))
     return df
