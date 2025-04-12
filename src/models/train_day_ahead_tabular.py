@@ -16,7 +16,7 @@ def train_day_ahead_tabular(
         val: pd.DataFrame,
         metric: str | Scorer,
 ) -> TabularPredictor:
-    path = os.path.join(DAY_AHEAD_MODEL_DIR, f"tabular_model_{metric}")
+    path = os.path.join(DAY_AHEAD_MODEL_DIR, f"tabular/{metric}")
     try:
         logging.info(f"Loading model from {path}")
         return TabularPredictor.load(path)

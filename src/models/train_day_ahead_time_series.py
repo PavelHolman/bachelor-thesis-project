@@ -4,6 +4,7 @@ import os
 from autogluon.timeseries import TimeSeriesPredictor, TimeSeriesDataFrame
 from autogluon.timeseries.metrics import TimeSeriesScorer
 
+from src.models.data_split import DA_KNOWN
 from utils import DAY_AHEAD_MODEL_DIR
 
 __KNOWN = ["T", "WF"]
@@ -16,7 +17,7 @@ def train_day_ahead_time_series(
         val: TimeSeriesDataFrame,
         metric: str | TimeSeriesScorer,
 ) -> TimeSeriesPredictor:
-    path = os.path.join(DAY_AHEAD_MODEL_DIR, f"time_series_model_{metric}")
+    path = os.path.join(DAY_AHEAD_MODEL_DIR, f"time/{metric}")
     try:
         logging.info(f"Loading model from {path}")
         return TimeSeriesPredictor.load(path)
@@ -24,7 +25,7 @@ def train_day_ahead_time_series(
         logging.info(f"Model not found, training a new model")
         return TimeSeriesPredictor(
             target="DA Price (EUR/MWh)",
-            known_covariates_names=[col for col in train.columns if any(col.startswith(prefix) for prefix in __KNOWN)],
+            known_covariates_names=[col for col in train.columns if any(col.startswith(prefix) for prefix in DA_KNOWN)],
             freq="h",
             prediction_length=7 * 24,
             eval_metric=metric,
