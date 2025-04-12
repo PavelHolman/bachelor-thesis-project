@@ -7,10 +7,10 @@ ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 MODEL_DIR = os.path.join(ROOT_DIR, 'models/')
 
-INTRADAY_MODEL_DIR = os.path.join(MODEL_DIR, 'intraday/')
+INTRA_DAY_MODEL_DIR = os.path.join(MODEL_DIR, 'intra_day/')
 DAY_AHEAD_MODEL_DIR = os.path.join(MODEL_DIR, 'day_ahead/')
 
-os.makedirs(INTRADAY_MODEL_DIR, exist_ok=True)
+os.makedirs(INTRA_DAY_MODEL_DIR, exist_ok=True)
 os.makedirs(DAY_AHEAD_MODEL_DIR, exist_ok=True)
 
 # Data directories
