@@ -25,13 +25,7 @@ def shuffled_split(
     test = remaining.sample(frac=test_size / (test_size + eval_size))
     evaluation = remaining.drop(test.index)
 
-    logging.info(
-        f"Data split: "
-        f"{len(train)} train ({len(train) / len(df)}), "
-        f"{len(val)} val ({len(val) / len(df)}), "
-        f"{len(test)} test ({len(test) / len(df)}), "
-        f"{len(evaluation)} evaluation ({len(evaluation) / len(df)})"
-    )
+    __log_data_split_info(df, train, val, test, evaluation)
     return train, val, test, evaluation
 
 
@@ -57,11 +51,22 @@ def time_series_split(
     test = TimeSeriesDataFrame.from_data_frame(df[(df["timestamp"] >= test_cutoff) & (df["timestamp"] < eval_cutoff)])
     evaluation = TimeSeriesDataFrame.from_data_frame(df[df["timestamp"] >= eval_cutoff])
 
-    logging.info(
-        f"Data split: "
-        f"{len(train)} train ({len(train) / len(df)}), "
-        f"{len(val)} val ({len(val) / len(df)}), "
-        f"{len(test)} test ({len(test) / len(df)}), "
-        f"{len(evaluation)} evaluation ({len(evaluation) / len(df)})"
-    )
+    __log_data_split_info(df, train, val, test, evaluation)
     return train, val, test, evaluation
+
+
+def __log_data_split_info(
+        df: pd.DataFrame,
+        train: pd.DataFrame,
+        val: pd.DataFrame,
+        test: pd.DataFrame,
+        evaluation: pd.DataFrame
+):
+    logging.info(
+        f"Data split info:\n"
+        f"Original DataFrame size: {len(df)}\n"
+        f"Train size: {len(train)} ({len(train) / len(df):.2%})\n"
+        f"Validation size: {len(val)} ({len(val) / len(df):.2%})\n"
+        f"Test size: {len(test)} ({len(test) / len(df):.2%})\n"
+        f"Evaluation size: {len(evaluation)} ({len(evaluation) / len(df):.2%})"
+    )
