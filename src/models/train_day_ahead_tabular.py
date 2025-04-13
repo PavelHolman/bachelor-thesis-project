@@ -10,19 +10,20 @@ from utils import DAY_AHEAD_MODEL_DIR
 __MODELS = {
     "RF": {},
     "KNN": {},
-    "GBM": {},
     "CAT": {},
     "XGB": {}
 }
-__TUNING = None
 
 
 def train_day_ahead_tabular(
         train: pd.DataFrame,
         val: pd.DataFrame,
         metric: str | Scorer,
+        cache: str,
+        models: dict[str, dict] = None,
 ) -> TabularPredictor:
-    path = os.path.join(DAY_AHEAD_MODEL_DIR, f"tabular/{metric}")
+    path = os.path.join(DAY_AHEAD_MODEL_DIR, f"tabular/{cache}")
+    models = models or __MODELS
     try:
         logging.info(f"Loading model from {path}")
         return TabularPredictor.load(path)
@@ -34,4 +35,4 @@ def train_day_ahead_tabular(
             eval_metric=metric,
             path=path,
             verbosity=2,
-        ).fit(train, val, hyperparameters=__MODELS, hyperparameter_tune_kwargs=__TUNING)
+        ).fit(train, val, hyperparameters=models)

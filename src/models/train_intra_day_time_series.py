@@ -7,16 +7,29 @@ from autogluon.timeseries.metrics import TimeSeriesScorer
 from src.models.data_split import ID_KNOWN
 from utils import INTRA_DAY_MODEL_DIR
 
-__MODELS = {}
-__TUNING = {}
+__MODELS = {
+    "Naive": {},
+    "SeasonalNaive": {},
+    "Average": {},
+    "SeasonalAverage": {},
+    "ETS": {},
+    "AutoETS": {},
+    "AutoARIMA": {},
+    "DirectTabular": {},
+    "RecursiveTabular": {},
+    "Chronos": {},
+}
 
 
 def train_intra_day_time_series(
         train: TimeSeriesDataFrame,
-        val: TimeSeriesDataFrame,
+        val: TimeSeriesDataFrame | None,
         metric: str | TimeSeriesScorer,
+        cache: str,
+        models: dict[str, dict] = None,
 ) -> TimeSeriesPredictor:
-    path = os.path.join(INTRA_DAY_MODEL_DIR, f"time/{metric}")
+    path = os.path.join(INTRA_DAY_MODEL_DIR, f"time/{cache}")
+    models = models or __MODELS
     try:
         logging.info(f"Loading model from {path}")
         return TimeSeriesPredictor.load(path)
@@ -30,4 +43,4 @@ def train_intra_day_time_series(
             eval_metric=metric,
             path=path,
             verbosity=2,
-        ).fit(train, val, hyperparameters=__MODELS, hyperparameter_tune_kwargs=__TUNING)
+        ).fit(train, val, hyperparameters=models)

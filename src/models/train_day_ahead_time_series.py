@@ -19,15 +19,17 @@ __MODELS = {
     "RecursiveTabular": {},
     "Chronos": {},
 }
-__TUNING = None
 
 
 def train_day_ahead_time_series(
         train: TimeSeriesDataFrame,
-        val: TimeSeriesDataFrame,
+        val: TimeSeriesDataFrame | None,
         metric: str | TimeSeriesScorer,
+        cache: str,
+        models: dict[str, dict] = None,
 ) -> TimeSeriesPredictor:
-    path = os.path.join(DAY_AHEAD_MODEL_DIR, f"time/{metric}")
+    path = os.path.join(DAY_AHEAD_MODEL_DIR, f"time/{cache}")
+    models = models or __MODELS
     try:
         logging.info(f"Loading model from {path}")
         return TimeSeriesPredictor.load(path)
@@ -41,4 +43,4 @@ def train_day_ahead_time_series(
             eval_metric=metric,
             path=path,
             verbosity=2,
-        ).fit(train, val, hyperparameters=__MODELS, hyperparameter_tune_kwargs=__TUNING)
+        ).fit(train, val, hyperparameters=models)

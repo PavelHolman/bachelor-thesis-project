@@ -7,16 +7,23 @@ from autogluon.tabular import TabularPredictor
 
 from utils import INTRA_DAY_MODEL_DIR
 
-__MODELS = {}
-__TUNING = {}
+__MODELS = {
+    "RF": {},
+    "KNN": {},
+    "CAT": {},
+    "XGB": {}
+}
 
 
 def train_intra_day_tabular(
         train: pd.DataFrame,
         val: pd.DataFrame,
         metric: str | Scorer,
+        cache: str,
+        models: dict[str, dict] = None,
 ) -> TabularPredictor:
-    path = os.path.join(INTRA_DAY_MODEL_DIR, f"tabular/{metric}")
+    path = os.path.join(INTRA_DAY_MODEL_DIR, f"tabular/{cache}")
+    models = models or __MODELS
     try:
         logging.info(f"Loading model from {path}")
         return TabularPredictor.load(path)
@@ -28,4 +35,4 @@ def train_intra_day_tabular(
             eval_metric=metric,
             path=path,
             verbosity=2,
-        ).fit(train, val, hyperparameters=__MODELS, hyperparameter_tune_kwargs=__TUNING)
+        ).fit(train, val, hyperparameters=models)
