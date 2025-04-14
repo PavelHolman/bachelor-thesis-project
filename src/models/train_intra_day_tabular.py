@@ -22,6 +22,15 @@ def train_intra_day_tabular(
         cache: str,
         models: dict[str, dict] = None,
 ) -> TabularPredictor:
+    """
+    Train a tabular model for intraday price prediction using AutoGluon.
+    :param train: Training data.
+    :param val: Validation data.
+    :param metric: Evaluation metric to use for model training.
+    :param cache: Cache name for saving the model.
+    :param models: Dictionary of models to use for training in AutoGluon format.
+    :return: Trained TabularPredictor model.
+    """
     path = os.path.join(INTRA_DAY_MODEL_DIR, f"tabular/{cache}")
     models = models or __MODELS
     try:

@@ -28,6 +28,15 @@ def train_intra_day_time_series(
         cache: str,
         models: dict[str, dict] = None,
 ) -> TimeSeriesPredictor:
+    """
+    Train a time series model for intraday price prediction using AutoGluon.
+    :param train: Training data.
+    :param val: Validation data.
+    :param metric: Evaluation metric to use for model training.
+    :param cache: Cache name for saving the model.
+    :param models: Dictionary of models to use for training in AutoGluon format.
+    :return: Trained TimeSeriesPredictor model.
+    """
     path = os.path.join(INTRA_DAY_MODEL_DIR, f"time/{cache}")
     models = models or __MODELS
     try:

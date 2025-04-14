@@ -14,6 +14,8 @@ DATA_PATH = os.path.join(INTERIM_DATA_DIR, "data.csv")
 def load_all_data(start: pd.Timestamp, end: pd.Timestamp, inclusive: Inclusive = "left") -> pd.DataFrame:
     """
     Load all data sources and merge them into a single DataFrame.
+    That includes the Open Meteo historical weather forecast data,
+    the OTE day-ahead and intraday market data, and the ENTSO-E power grid data.
     :param start: Timestamp to start loading data from.
     :param end: Timestamp to stop loading data at.
     :param inclusive: Whether to include the start and end timestamps in the range.

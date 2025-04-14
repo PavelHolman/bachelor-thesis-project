@@ -4,7 +4,8 @@ import pandas as pd
 
 def generate_time_features(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Generate time-based features for the given DataFrame.
+    Generate time-based features for the given DataFrame such as hour of day,
+    day of week, month, year, and whether the date is a holiday.
     :param df: DataFrame containing the data.
     :return: DataFrame with generated time-based features.
     """

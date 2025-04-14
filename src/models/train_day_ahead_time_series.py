@@ -28,6 +28,16 @@ def train_day_ahead_time_series(
         cache: str,
         models: dict[str, dict] = None,
 ) -> TimeSeriesPredictor:
+    """
+    Train a time series model for day-ahead price prediction using AutoGluon.
+    The prediction length is set to 7 days (168 hours).
+    :param train: Training data.
+    :param val: Validation data.
+    :param metric: Evaluation metric to use for model training.
+    :param cache: Cache name for saving the model.
+    :param models: Dictionary of models to use for training in AutoGluon format.
+    :return: Trained TimeSeriesPredictor model.
+    """
     path = os.path.join(DAY_AHEAD_MODEL_DIR, f"time/{cache}")
     models = models or __MODELS
     try:
