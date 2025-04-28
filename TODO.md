@@ -36,27 +36,27 @@
 
 ### Train models
 
-- [ ] Train AutoGluon models
-    - [ ] DA known covariates
-    - [ ] ID known covariates
-    - [ ] TimeSeries and Tabular models
-    - [ ] Evaluation metrics
-        - [ ] MAE, MAPE, RMSE
-        - [ ] Maximum error
-        - [ ] Error percentiles
-    - [ ] Hyperparameter tuning
-    - [ ] Feature selection
-    - [ ] Model selection
+- [x] Train AutoGluon models
+    - [x] DA known covariates
+    - [x] ID known covariates
+    - [x] TimeSeries and Tabular models
+    - [x] Evaluation metrics
+        - [x] MAE, RMSE
+        - [ ] WMAE
+    - [x] Hyperparameter tuning
+    - [x] Model selection
 
 ### Evaluation
 
-- [ ] Evaluate each trained model
-    - [ ] Evaluate single metric and rolling metrics
-        - [ ] MAE, MAPE, RMSE
-        - [ ] Maximum error
-        - [ ] Error percentiles
-    - [ ] Evaluate on selection set
-    - [ ] Plot predictions vs. actuals
-    - [ ] Plot feature importance
-    - [ ] Plot error distribution
+- [x] Backtesting
+- [x] Evaluate each trained model
+    - [x] Plot predictions vs. actuals
+    - [x] Plot error distribution
+    - [ ] Plot metrics
 - [ ] Retrain best model on full training set and repeat evaluation on test set
+
+### Add some EDA
+
+- [ ] EDA
+- [ ] DA as ID
+- [ ] Feature importance
