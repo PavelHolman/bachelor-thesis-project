@@ -9,7 +9,7 @@ import seaborn as sns
 from matplotlib import pyplot as plt
 
 
-def evaluate_model(
+def evaluate_timeseries_model(
         predictor: TimeSeriesPredictor,
         train: TimeSeriesDataFrame,
         val: TimeSeriesDataFrame,
@@ -39,7 +39,7 @@ def evaluate_model(
         plt.plot()
 
 
-def evaluate_model(
+def evaluate_tabular_model(
         predictor: TabularPredictor,
         train: pd.DataFrame,
         val: pd.DataFrame,
