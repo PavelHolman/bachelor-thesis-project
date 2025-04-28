@@ -20,3 +20,4 @@ holidays~=0.69
 numpy~=1.26.4
 scikit-learn~=1.5.1
 tqdm~=4.67.1
+seaborn~=0.13.2
