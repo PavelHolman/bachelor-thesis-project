@@ -30,6 +30,7 @@ def train_intra_day_time_series(
 ) -> TimeSeriesPredictor:
     """
     Train a time series model for intraday price prediction using AutoGluon.
+    The prediction length is set to 1 day (96 * 15-minutes).
     :param train: Training data.
     :param val: Validation data.
     :param metric: Evaluation metric to use for model training.
