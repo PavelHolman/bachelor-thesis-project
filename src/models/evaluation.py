@@ -10,6 +10,8 @@ from autogluon.timeseries.splitter import ExpandingWindowSplitter
 import seaborn as sns
 from matplotlib import pyplot as plt
 
+__eval_days = 14
+
 
 def evaluate_timeseries_model(
         predictor: TimeSeriesPredictor,
@@ -20,24 +22,38 @@ def evaluate_timeseries_model(
 ):
     target = predictor.target
     prediction_length = predictor.prediction_length
-
     model_names = predictor.model_names()
+    freq = predictor.freq if predictor.freq[0].isdigit() else "1" + predictor.freq
+    intervals_per_day = int(pd.Timedelta(days=1) // pd.Timedelta(freq))
+    n_days = prediction_length // intervals_per_day
 
     for name in model_names:
-        fig, axes = plt.subplots(2, 3, figsize=(32, 18))
+        fig, axes = plt.subplots(n_days * 2, 3, figsize=(32, n_days * 9))
         for ((i, split_name), data) in zip(enumerate(["Training", "Validation", "Selection"]), [train, val, select]):
             logging.info(f"Evaluating {name} on {split_name} data...")
-            preds = pd.DataFrame()
-            num_val_windows = 3
-            splitter = ExpandingWindowSplitter(prediction_length=prediction_length, num_val_windows=num_val_windows)
+            preds = [pd.DataFrame() for _ in range(n_days)]
+            splitter = ExpandingWindowSplitter(
+                prediction_length=prediction_length,
+                num_val_windows=__eval_days,
+                val_step_size=intervals_per_day
+            )
             for (past_data, future_data) in splitter.split(data):
-                preds = pd.concat([preds, predictor.predict(data=past_data, known_covariates=future_data, model=name)])
+                predictions = predictor.predict(data=past_data, known_covariates=future_data, model=name)
+                for j in range(n_days):
+                    preds[j] = pd.concat([preds[j], predictions[intervals_per_day * j:intervals_per_day * (j + 1)]])
 
-            y_index = np.array([ts for (_, ts) in data.index[-num_val_windows * prediction_length:].values])
-            y_true = data[target][-num_val_windows * prediction_length:].values
-            y_pred = preds["mean"].values
+            for j in range(n_days):
+                last_timestamp = data.index.values[-1][1]
+                past_one_day = last_timestamp.floor("D") + pd.Timedelta(days=1)
+                last_day = past_one_day - pd.Timedelta(days=(n_days - j - 1))
+                first_day = last_day - pd.Timedelta(days=__eval_days)
+                date_mask = (data.index.get_level_values(1) >= first_day) & (data.index.get_level_values(1) < last_day)
+                range_data = data[date_mask]
+                y_index = np.array([ts for (_, ts) in range_data.index.values])
+                y_true = range_data[target].values
+                y_pred = preds[j]["mean"].values
 
-            __plot_predictions(y_index, y_true, y_pred, target, name, split_name, axes[0, i], axes[1, i])
+                __plot_pred(y_index, y_true, y_pred, target, name, split_name, axes[2 * j, i], axes[2 * j + 1, i])
         plt.plot()
 
 
@@ -49,24 +65,23 @@ def evaluate_tabular_model(
         metrics: list[Scorer],
 ):
     target = predictor.label
-
     model_names = predictor.model_names()
 
     for name in model_names:
         fig, axes = plt.subplots(2, 3, figsize=(32, 18))
         for ((i, split_name), data) in zip(enumerate(["Training", "Validation", "Selection"]), [train, val, select]):
-            data = data[-21 * 24:]
+            data = data[data.index > (data.index[-1] - pd.Timedelta(days=__eval_days))]
             logging.info(f"Evaluating {name} on {split_name} data...")
 
             y_index = data.index.values
             y_true = data[target].values
             y_pred = predictor.predict(data=data, model=name)
 
-            __plot_predictions(y_index, y_true, y_pred, target, name, split_name, axes[0, i], axes[1, i])
+            __plot_pred(y_index, y_true, y_pred, target, name, split_name, axes[0, i], axes[1, i])
         plt.plot()
 
 
-def __plot_predictions(
+def __plot_pred(
         y_index: np.ndarray,
         y_true: np.ndarray,
         y_pred: np.ndarray,
