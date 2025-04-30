@@ -42,7 +42,7 @@
     - [x] TimeSeries and Tabular models
     - [x] Evaluation metrics
         - [x] MAE, RMSE
-        - [ ] WMAE
+        - [x] WMAE
     - [x] Hyperparameter tuning
     - [x] Model selection
 
@@ -52,11 +52,10 @@
 - [x] Evaluate each trained model
     - [x] Plot predictions vs. actuals
     - [x] Plot error distribution
-    - [ ] Plot metrics
-- [ ] Retrain best model on full training set and repeat evaluation on test set
+    - [x] Plot metrics
+- [ ] Retrain the best model on a full training set and repeat evaluation on a test set
 
 ### Add some EDA
 
-- [ ] EDA
 - [ ] DA as ID
 - [ ] Feature importance
