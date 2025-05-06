@@ -9,15 +9,20 @@ from utils import DAY_AHEAD_MODEL_DIR
 
 __MODELS = {
     "Naive": {},
-    "SeasonalNaive": {},
+    "SeasonalNaive": [{"seasonal_period": 24}, {"seasonal_period": 7 * 24}],
     "Average": {},
-    "SeasonalAverage": {},
-    "ETS": {},
-    "AutoETS": {},
-    "AutoARIMA": {},
+    "SeasonalAverage": [{"seasonal_period": 24}, {"seasonal_period": 7 * 24}],
+    "AutoETS": [{"seasonal_period": 24}, {"seasonal_period": 7 * 24}],
+    "AutoARIMA": [{"seasonal_period": 24}, {"seasonal_period": 7 * 24}],
     "DirectTabular": {},
     "RecursiveTabular": {},
     "Chronos": {},
+}
+
+__TUNE = {
+    "num_trials": 5,
+    "searcher": "auto",
+    "scheduler": "local",
 }
 
 
@@ -40,6 +45,7 @@ def train_day_ahead_time_series(
     """
     path = os.path.join(DAY_AHEAD_MODEL_DIR, f"time/{cache}")
     models = models or __MODELS
+    tune = __TUNE
     try:
         logging.info(f"Loading model from {path}")
         return TimeSeriesPredictor.load(path)
@@ -53,4 +59,4 @@ def train_day_ahead_time_series(
             eval_metric=metric,
             path=path,
             verbosity=2,
-        ).fit(train, val, hyperparameters=models)
+        ).fit(train, val, hyperparameters=models, hyperparameter_tune_kwargs=tune)
