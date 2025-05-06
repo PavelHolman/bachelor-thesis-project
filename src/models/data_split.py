@@ -5,7 +5,9 @@ from autogluon.common import TabularDataset
 from autogluon.timeseries import TimeSeriesDataFrame
 
 DA_KNOWN = ["T", "WF"]
+DA_TARGET = "DA Price (EUR/MWh)"
 ID_KNOWN = ["T", "WF", "DA", "PG"]
+ID_TARGET = "ID Weighted average of the prices (EUR/MWh)"
 
 
 def tabular_split(
