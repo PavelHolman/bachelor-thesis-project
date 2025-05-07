@@ -5,7 +5,6 @@ import pandas as pd
 from autogluon.core.metrics import Scorer
 from autogluon.tabular import TabularPredictor
 from autogluon.timeseries import TimeSeriesPredictor, TimeSeriesDataFrame
-from autogluon.timeseries.metrics.abstract import TimeSeriesScorer
 from autogluon.timeseries.splitter import ExpandingWindowSplitter
 import seaborn as sns
 from matplotlib import pyplot as plt
@@ -31,7 +30,7 @@ def evaluate_timeseries_model(
         columns=["model"] + [f"{metric.name} [{s} ({d})]" for metric in metrics for s in splits for d in range(n_days)])
 
     for model_name in model_names:
-        fig, axes = plt.subplots(n_days * 2, 3, figsize=(32, n_days * 9))
+        fig, axes = plt.subplots(n_days * 2, 3, figsize=(32, n_days * 18))
         metric_results = {}
         for ((i, split), data) in zip(enumerate(splits), [train, val, select]):
             logging.info(f"Evaluating {model_name} on {split} data...")
