@@ -74,6 +74,8 @@ def __fetch_openmeteo_data(start: pd.Timestamp, end: pd.Timestamp, coords: list[
 
     dataframes = []
 
+    logging.debug(", ".join(f"({response.Latitude()}, {response.Longitude()})" for response in responses))
+
     for response, (lat, long) in zip(responses, coords):
         minutely_15 = response.Minutely15()
         minutely_15_temperature_2m = minutely_15.Variables(0).ValuesAsNumpy()
