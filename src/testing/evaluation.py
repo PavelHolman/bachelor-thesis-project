@@ -1,20 +1,34 @@
 import logging
+import os
 
 import pandas as pd
 from autogluon.tabular import TabularPredictor
 from autogluon.timeseries import TimeSeriesPredictor, TimeSeriesDataFrame
 from autogluon.timeseries.splitter import ExpandingWindowSplitter
 
+from utils import RESULTS_DIR
+
 __eval_days = 14
 
 
-def predict_timeseries_model(predictor: TimeSeriesPredictor, data: TimeSeriesDataFrame) -> dict[str, pd.DataFrame]:
+def predict_timeseries_model(
+        predictor: TimeSeriesPredictor, data: TimeSeriesDataFrame, cache: str
+) -> dict[str, pd.DataFrame]:
     prediction_length = predictor.prediction_length
     freq = predictor.freq if predictor.freq[0].isdigit() else "1" + predictor.freq
     intervals_per_day = int(pd.Timedelta(days=1) // pd.Timedelta(freq))
     n_days = prediction_length // intervals_per_day
     predictions = {}
+    cache_path = os.path.join(RESULTS_DIR, cache)
+    os.makedirs(cache_path, exist_ok=True)
+
     for model_name in predictor.model_names():
+        result_path = os.path.join(cache_path, model_name)
+        if os.path.isfile(result_path):
+            logging.info(f"Loading cached predictions for {model_name}")
+            predictions[model_name] = pd.read_csv(result_path, index_col=0, parse_dates=True)
+            continue
+
         logging.info(f"Predicting with {model_name}...")
         model_predictions = pd.DataFrame()
         splitter = ExpandingWindowSplitter(
@@ -31,6 +45,7 @@ def predict_timeseries_model(predictor: TimeSeriesPredictor, data: TimeSeriesDat
                 index=daily_predictions[0].index.get_level_values(1))
             model_predictions = pd.concat([model_predictions, daily_means], axis=0)
         predictions[model_name] = model_predictions
+        model_predictions.to_csv(result_path)
     return predictions
 
 
