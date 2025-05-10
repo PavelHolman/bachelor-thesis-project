@@ -32,5 +32,5 @@ def load_intra_day_tabular_split() -> tuple[pd.DataFrame, pd.DataFrame, pd.DataF
 
 def load_intra_day_time_series_split() -> tuple[
     TimeSeriesDataFrame, TimeSeriesDataFrame, TimeSeriesDataFrame, TimeSeriesDataFrame]:
-    df = load_day_ahead_dataset(__start, __end)
+    df = load_intra_day_dataset(__start, __end)
     return time_series_split(df, __val_cutoff, __select_cutoff, __test_cutoff)
