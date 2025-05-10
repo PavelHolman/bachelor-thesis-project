@@ -4,7 +4,7 @@ import os
 from autogluon.timeseries import TimeSeriesPredictor, TimeSeriesDataFrame
 from autogluon.timeseries.metrics import TimeSeriesScorer
 
-from src.models.data_split import ID_KNOWN
+from src.testing.data_split import ID_KNOWN
 from utils import INTRA_DAY_MODEL_DIR
 
 __MODELS = {
