@@ -11,9 +11,11 @@ MODEL_DIR = os.path.join(ROOT_DIR, 'models/')
 
 INTRA_DAY_MODEL_DIR = os.path.join(MODEL_DIR, 'intra_day/')
 DAY_AHEAD_MODEL_DIR = os.path.join(MODEL_DIR, 'day_ahead/')
+RESULTS_DIR = os.path.join(MODEL_DIR, 'results/')
 
 os.makedirs(INTRA_DAY_MODEL_DIR, exist_ok=True)
 os.makedirs(DAY_AHEAD_MODEL_DIR, exist_ok=True)
+os.makedirs(RESULTS_DIR, exist_ok=True)
 
 # Data directories
 
