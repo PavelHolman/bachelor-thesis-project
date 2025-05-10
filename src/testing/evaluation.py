@@ -12,7 +12,7 @@ from utils import RESULTS_DIR
 __eval_days = 14
 
 
-def predict_timeseries_model(
+def predict_time_series_model(
         predictor: TimeSeriesPredictor, data: TimeSeriesDataFrame, cache: str
 ) -> dict[str, pd.DataFrame]:
     prediction_length = predictor.prediction_length
@@ -55,7 +55,7 @@ def predict_tabular_model(predictor: TabularPredictor, data: pd.DataFrame) -> di
     predictions = {}
     for model_name in predictor.model_names():
         logging.info(f"Predicting with {model_name}...")
-        predictions[model_name] = predictor.predict(data=pred_data, model=model_name)
+        predictions[model_name] = pd.DataFrame(predictor.predict(data=pred_data, model=model_name))
     return predictions
 
 
