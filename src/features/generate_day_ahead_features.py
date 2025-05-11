@@ -1,5 +1,7 @@
 import pandas as pd
 
+from src.testing.data_split import DA_TARGET
+
 
 def generate_day_ahead_features(df: pd.DataFrame) -> pd.DataFrame:
     """
@@ -9,7 +11,7 @@ def generate_day_ahead_features(df: pd.DataFrame) -> pd.DataFrame:
     """
     day_ahead_df = pd.DataFrame(index=df.index)
 
-    day_ahead_series = df["DA Price (EUR/MWh)"]
+    day_ahead_series = df[DA_TARGET]
     freq = df.index.inferred_freq if df.index.inferred_freq[0].isdigit() else f"1{df.index.inferred_freq}"
     intervals_per_day = int(pd.Timedelta("1D") / pd.Timedelta(freq))
 

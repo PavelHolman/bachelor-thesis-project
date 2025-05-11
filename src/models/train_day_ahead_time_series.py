@@ -4,7 +4,7 @@ import os
 from autogluon.timeseries import TimeSeriesPredictor, TimeSeriesDataFrame
 from autogluon.timeseries.metrics import TimeSeriesScorer
 
-from src.testing.data_split import DA_KNOWN
+from src.testing.data_split import DA_KNOWN, DA_TARGET
 from utils import DAY_AHEAD_MODEL_DIR
 
 __MODELS = {
@@ -45,7 +45,7 @@ def train_day_ahead_time_series(
     except FileNotFoundError:
         logging.info(f"Model not found, training a new model")
         return TimeSeriesPredictor(
-            target="DA Price (EUR/MWh)",
+            target=DA_TARGET,
             known_covariates_names=[col for col in train.columns if any(col.startswith(prefix) for prefix in DA_KNOWN)],
             freq="h",
             prediction_length=7 * 24,

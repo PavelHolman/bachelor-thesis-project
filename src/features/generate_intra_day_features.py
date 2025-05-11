@@ -1,5 +1,7 @@
 import pandas as pd
 
+from src.testing.data_split import ID_TARGET
+
 
 def generate_intra_day_features(df: pd.DataFrame) -> pd.DataFrame:
     """
@@ -9,7 +11,7 @@ def generate_intra_day_features(df: pd.DataFrame) -> pd.DataFrame:
     """
     intra_day_df = pd.DataFrame(index=df.index)
 
-    intra_day_series = df["ID Weighted average of the prices (EUR/MWh)"]
+    intra_day_series = df[ID_TARGET]
     intervals_per_day = int(pd.Timedelta("1D") / pd.Timedelta(df.index.inferred_freq))
 
     for lag in range(1, 7 * intervals_per_day + 1):

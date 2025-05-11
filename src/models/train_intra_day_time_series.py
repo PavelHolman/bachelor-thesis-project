@@ -4,7 +4,7 @@ import os
 from autogluon.timeseries import TimeSeriesPredictor, TimeSeriesDataFrame
 from autogluon.timeseries.metrics import TimeSeriesScorer
 
-from src.testing.data_split import ID_KNOWN
+from src.testing.data_split import ID_KNOWN, ID_TARGET
 from utils import INTRA_DAY_MODEL_DIR
 
 __MODELS = {
@@ -45,7 +45,7 @@ def train_intra_day_time_series(
     except FileNotFoundError:
         logging.info(f"Model not found, training a new model")
         return TimeSeriesPredictor(
-            target="ID Weighted average of the prices (EUR/MWh)",
+            target=ID_TARGET,
             known_covariates_names=[col for col in train.columns if any(col.startswith(prefix) for prefix in ID_KNOWN)],
             freq="15min",
             prediction_length=24 * 4,

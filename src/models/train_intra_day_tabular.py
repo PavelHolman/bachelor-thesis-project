@@ -5,6 +5,7 @@ import pandas as pd
 from autogluon.core.metrics import Scorer
 from autogluon.tabular import TabularPredictor
 
+from src.testing.data_split import ID_TARGET
 from utils import INTRA_DAY_MODEL_DIR
 
 __MODELS = {
@@ -39,7 +40,7 @@ def train_intra_day_tabular(
     except FileNotFoundError:
         logging.info(f"Model not found, training a new model")
         return TabularPredictor(
-            label="ID Weighted average of the prices (EUR/MWh)",
+            label=ID_TARGET,
             problem_type="regression",
             eval_metric=metric,
             path=path,

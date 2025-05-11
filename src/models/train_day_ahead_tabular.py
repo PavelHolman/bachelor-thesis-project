@@ -5,6 +5,7 @@ import pandas as pd
 from autogluon.core.metrics import Scorer
 from autogluon.tabular import TabularPredictor
 
+from src.testing.data_split import DA_TARGET
 from utils import DAY_AHEAD_MODEL_DIR
 
 __MODELS = {
@@ -39,7 +40,7 @@ def train_day_ahead_tabular(
     except FileNotFoundError:
         logging.info(f"Model not found, training a new model")
         return TabularPredictor(
-            label="DA Price (EUR/MWh)",
+            label=DA_TARGET,
             problem_type="regression",
             eval_metric=metric,
             path=path,
