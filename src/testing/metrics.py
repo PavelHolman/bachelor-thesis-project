@@ -1,7 +1,7 @@
 import numpy as np
 from autogluon.core.metrics import mean_absolute_error, root_mean_squared_error, mean_absolute_percentage_error
 from autogluon.core.metrics import make_scorer
-from sklearn.metrics import precision_score, recall_score, f1_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
 
 def get_eval_metrics():
@@ -21,7 +21,7 @@ def __peak_detection_accuracy(y_true: np.array, y_pred: np.array, q: float = 0.9
     threshold = np.quantile(y_true, q)
     true_peaks = (y_true > threshold).astype(int)
     pred_peaks = (y_pred > threshold).astype(int)
-    return np.mean(true_peaks == pred_peaks)
+    return accuracy_score(true_peaks == pred_peaks)
 
 
 def __peak_detection_precision(y_true: np.array, y_pred: np.array, q: float = 0.9):
