@@ -22,12 +22,7 @@ def load_day_ahead_dataset(start: pd.Timestamp, end: pd.Timestamp, save: bool=Fa
     """
     logging.info("Loading day ahead data")
     df = load_all_data(start, end)
-    df.drop(columns=[
-        "ID Weighted average of the prices (EUR/MWh)",
-        "ID Minimal price (EUR/MWh)",
-        "ID Maximal price (EUR/MWh)",
-        "ID Volume (MWh)"
-    ], inplace=True)
+    df.drop(columns=[col for col in df.columns if col.startswith("ID")], inplace=True)
     df = unfold_15_minutely_columns(df)
     time_features = generate_time_features(df)
     day_ahead_features = generate_day_ahead_features(df)
