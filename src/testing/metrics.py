@@ -21,7 +21,7 @@ def __peak_detection_accuracy(y_true: np.array, y_pred: np.array, q: float = 0.9
     threshold = np.quantile(y_true, q)
     true_peaks = (y_true > threshold).astype(int)
     pred_peaks = (y_pred > threshold).astype(int)
-    return accuracy_score(true_peaks == pred_peaks)
+    return accuracy_score(true_peaks, pred_peaks)
 
 
 def __peak_detection_precision(y_true: np.array, y_pred: np.array, q: float = 0.9):
@@ -54,7 +54,7 @@ directional_accuracy = make_scorer(
 peak_detection_accuracy = make_scorer(
     score_func=__peak_detection_accuracy,
     greater_is_better=True,
-    name="peak detection",
+    name="peak detection accuracy",
 )
 
 peak_detection_precision = make_scorer(
