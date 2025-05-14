@@ -78,6 +78,9 @@ def evaluate(
                 y_pred=pred.stack()
             )
 
+            if len(pred.columns) == 1:
+                continue
+
             for i, col in enumerate(pred.columns):
                 results[model_name][f"{metric.name} (T+{i})"] = metric(
                     y_true=true_like_predictions[col],
