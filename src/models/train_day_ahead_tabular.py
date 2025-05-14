@@ -36,13 +36,17 @@ def train_day_ahead_tabular(
     models = models or __MODELS
     try:
         logging.info(f"Loading model from {path}")
-        return TabularPredictor.load(path)
+        predictor = TabularPredictor.load(path)
     except FileNotFoundError:
         logging.info(f"Model not found, training a new model")
-        return TabularPredictor(
+        predictor = TabularPredictor(
             label=DA_TARGET,
             problem_type="regression",
             eval_metric=metric,
             path=path,
             verbosity=2,
         ).fit(train, val, hyperparameters=models)
+
+    logging.debug(f"{predictor.info()}")
+    logging.debug(f"{predictor.fit_summary()}")
+    return predictor

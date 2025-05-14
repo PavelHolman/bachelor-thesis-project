@@ -41,10 +41,10 @@ def train_intra_day_time_series(
     models = models or __MODELS
     try:
         logging.info(f"Loading model from {path}")
-        return TimeSeriesPredictor.load(path)
+        predictor = TimeSeriesPredictor.load(path)
     except FileNotFoundError:
         logging.info(f"Model not found, training a new model")
-        return TimeSeriesPredictor(
+        predictor = TimeSeriesPredictor(
             target=ID_TARGET,
             known_covariates_names=[col for col in train.columns if any(col.startswith(prefix) for prefix in ID_KNOWN)],
             freq="15min",
@@ -53,3 +53,7 @@ def train_intra_day_time_series(
             path=path,
             verbosity=2,
         ).fit(train, val, hyperparameters=models)
+
+    logging.debug(f"{predictor.info()}")
+    logging.debug(f"{predictor.fit_summary()}")
+    return predictor
