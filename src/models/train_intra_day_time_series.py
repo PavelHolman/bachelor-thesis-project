@@ -13,7 +13,8 @@ __MODELS = {
     "Average": {},
     "SeasonalAverage": [{"seasonal_period": 24 * 4}, {"seasonal_period": 7 * 24 * 4}],
     "AutoETS": [{"seasonal_period": 24 * 4}, {"seasonal_period": 7 * 24 * 4}],
-    "AutoARIMA": [{"seasonal_period": 24 * 4}, {"seasonal_period": 7 * 24 * 4}],
+    # ARIMA was terminating with Segmentation Fault
+    # "AutoARIMA": [{"seasonal_period": 24 * 4}, {"seasonal_period": 7 * 24 * 4}],
     "DirectTabular": {},
     "RecursiveTabular": {},
     "Chronos": {},
