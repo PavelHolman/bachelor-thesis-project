@@ -13,6 +13,7 @@ prices in the Czech market.
 - `notebooks/`: Jupyter notebooks used for data analysis, model training, and evaluation.
 - `src/`: Source code for data fetching, preprocessing, model training, and evaluation.
 - `requirements.txt`: List of Python packages required to run the code.
+- `utils.py`: Loads the environment variables and initializes the repository structure if needed.
 - `README.md`: This file.
 
 ## Setup Instructions
