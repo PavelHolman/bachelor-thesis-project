@@ -9,11 +9,11 @@ from utils import INTRA_DAY_MODEL_DIR
 
 __MODELS = {
     "Naive": {},
-    "SeasonalNaive": [{"seasonal_period": 24}, {"seasonal_period": 7 * 24}],
+    "SeasonalNaive": [{"seasonal_period": 24 * 4}, {"seasonal_period": 7 * 24 * 4}],
     "Average": {},
-    "SeasonalAverage": [{"seasonal_period": 24}, {"seasonal_period": 7 * 24}],
-    "AutoETS": [{"seasonal_period": 24}, {"seasonal_period": 7 * 24}],
-    "AutoARIMA": [{"seasonal_period": 24}, {"seasonal_period": 7 * 24}],
+    "SeasonalAverage": [{"seasonal_period": 24 * 4}, {"seasonal_period": 7 * 24 * 4}],
+    "AutoETS": [{"seasonal_period": 24 * 4}, {"seasonal_period": 7 * 24 * 4}],
+    "AutoARIMA": [{"seasonal_period": 24 * 4}, {"seasonal_period": 7 * 24 * 4}],
     "DirectTabular": {},
     "RecursiveTabular": {},
     "Chronos": {},
