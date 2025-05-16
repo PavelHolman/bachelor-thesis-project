@@ -13,7 +13,10 @@ __eval_days = 14
 
 
 def predict_time_series_model(
-        predictor: TimeSeriesPredictor, data: TimeSeriesDataFrame, cache: str
+        predictor: TimeSeriesPredictor,
+        data: TimeSeriesDataFrame,
+        cache: str,
+        model_names: list[str] = None,
 ) -> dict[str, pd.DataFrame]:
     prediction_length = predictor.prediction_length
     freq = predictor.freq if predictor.freq[0].isdigit() else "1" + predictor.freq
@@ -23,7 +26,7 @@ def predict_time_series_model(
     cache_path = os.path.join(RESULTS_DIR, cache)
     os.makedirs(cache_path, exist_ok=True)
 
-    for model_name in predictor.model_names():
+    for model_name in model_names or predictor.model_names():
         result_path = os.path.join(cache_path, model_name)
         if os.path.isfile(result_path):
             logging.info(f"Loading cached predictions for {model_name}")
@@ -50,13 +53,18 @@ def predict_time_series_model(
     return predictions
 
 
-def predict_tabular_model(predictor: TabularPredictor, data: pd.DataFrame, cache: str) -> dict[str, pd.DataFrame]:
+def predict_tabular_model(
+        predictor: TabularPredictor,
+        data: pd.DataFrame,
+        cache: str,
+        model_names: list[str] = None,
+) -> dict[str, pd.DataFrame]:
     cache_path = os.path.join(RESULTS_DIR, cache)
     os.makedirs(cache_path, exist_ok=True)
 
     pred_data = data[data.index > (data.index[-1] - pd.Timedelta(days=__eval_days))]
     predictions = {}
-    for model_name in predictor.model_names():
+    for model_name in model_names or predictor.model_names():
         result_path = os.path.join(cache_path, model_name)
         if os.path.isfile(result_path):
             logging.info(f"Loading cached predictions for {model_name}")
