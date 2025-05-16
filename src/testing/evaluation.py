@@ -50,12 +50,23 @@ def predict_time_series_model(
     return predictions
 
 
-def predict_tabular_model(predictor: TabularPredictor, data: pd.DataFrame) -> dict[str, pd.DataFrame]:
+def predict_tabular_model(predictor: TabularPredictor, data: pd.DataFrame, cache: str) -> dict[str, pd.DataFrame]:
+    cache_path = os.path.join(RESULTS_DIR, cache)
+    os.makedirs(cache_path, exist_ok=True)
+
     pred_data = data[data.index > (data.index[-1] - pd.Timedelta(days=__eval_days))]
     predictions = {}
     for model_name in predictor.model_names():
+        result_path = os.path.join(cache_path, model_name)
+        if os.path.isfile(result_path):
+            logging.info(f"Loading cached predictions for {model_name}")
+            predictions[model_name] = pd.read_csv(result_path, index_col=0, parse_dates=True)
+            continue
+
         logging.info(f"Predicting with {model_name}...")
-        predictions[model_name] = pd.DataFrame(predictor.predict(data=pred_data, model=model_name))
+        model_predictions = pd.DataFrame(predictor.predict(data=pred_data, model=model_name))
+        predictions[model_name] = model_predictions
+        model_predictions.to_csv(result_path)
     return predictions
 
 
