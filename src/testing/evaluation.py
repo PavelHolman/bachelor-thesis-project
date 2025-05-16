@@ -18,6 +18,17 @@ def predict_time_series_model(
         cache: str,
         model_names: list[str] = None,
 ) -> dict[str, pd.DataFrame]:
+    """
+    Predicts values for the given data using the given time series predictor, or returns cached predictions if available.
+    Since the prediction length might span multiple days, the predictions are tagged with the day they belong to.
+    For example, if the prediction length is 7 days, the predictions dataframe will contain 7 columns,
+    where each column corresponds to a day.
+    :param predictor: The time series predictor to use for prediction.
+    :param data: The data to predict on.
+    :param cache: The cache name to use for saving the predictions.
+    :param model_names: The names of the models to predict with. If None, all models are used.
+    :return: A dictionary with model names as keys and prediction dataframes as values.
+    """
     prediction_length = predictor.prediction_length
     freq = predictor.freq if predictor.freq[0].isdigit() else "1" + predictor.freq
     intervals_per_day = int(pd.Timedelta(days=1) // pd.Timedelta(freq))
@@ -59,6 +70,14 @@ def predict_tabular_model(
         cache: str,
         model_names: list[str] = None,
 ) -> dict[str, pd.DataFrame]:
+    """
+    Predicts values for the given data using the given tabular predictor, or returns cached predictions if available.
+    :param predictor: The tabular predictor to use for prediction.
+    :param data: The data to predict on.
+    :param cache: The cache name to use for saving the predictions.
+    :param model_names: The names of the models to predict with. If None, all models are used.
+    :return: A dictionary with model names as keys and prediction dataframes as values.
+    """
     cache_path = os.path.join(RESULTS_DIR, cache)
     os.makedirs(cache_path, exist_ok=True)
 
@@ -83,6 +102,15 @@ def evaluate(
         true_values: pd.Series,
         metrics: list[Scorer],
 ) -> pd.DataFrame:
+    """
+    Evaluates the predictions of multiple models on a given set of true values,
+    using the given metrics. If the predictions span multiple days,
+    the metrics are also computed for each day separately.
+    :param predictions: Dictionary with model names as keys and prediction dataframes as values.
+    :param true_values: Series with true values for at least the last __eval_days days.
+    :param metrics: List of metrics to evaluate.
+    :return: Dataframe with evaluation results for each model and metric.
+    """
     results = {}
     for model_name, pred in predictions.items():
         results[model_name] = {}

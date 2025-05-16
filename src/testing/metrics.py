@@ -5,6 +5,10 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 
 
 def get_eval_metrics():
+    """
+    Gets all the same evaluation metrics as in the thesis.
+    :return: List of evaluation metrics.
+    """
     return [
         mean_absolute_error, mean_absolute_percentage_error, root_mean_squared_error, directional_accuracy,
         peak_detection_accuracy, peak_detection_precision, peak_detection_recall, peak_detection_f1

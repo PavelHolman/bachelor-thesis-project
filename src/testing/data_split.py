@@ -4,6 +4,12 @@ import pandas as pd
 from autogluon.common import TabularDataset
 from autogluon.timeseries import TimeSeriesDataFrame
 
+"""
+Constants for the known and target columns in the day-ahead and intraday datasets.
+E.g., during the day-ahead prediction, the target column is "DA Price (EUR/MWh)" and only T (Time features)
+and WF (Weather Forecast features) are already known, however, the PG (Power Grid forecast features) or ID (Intraday)
+are not known in advance, and cannot be used for training as known covariates, only as past data.
+"""
 DA_KNOWN = ["T", "WF"]
 DA_TARGET = "DA Price (EUR/MWh)"
 ID_KNOWN = ["T", "WF", "DA", "PG"]
